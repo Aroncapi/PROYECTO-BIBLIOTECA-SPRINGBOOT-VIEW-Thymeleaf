@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: head('Gestión de Préstamos - Biblioteca Escolar')}">
+</head>
+<body>
+    <!-- Incluir navbar rediseñado -->
+    <div th:replace="~{layout/header :: navbar}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar rediseñado -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar-modern">
+                    <div class="sidebar-header">
+                        <h5>
+                            <i class="bi bi-person-badge"></i>
+                            Panel Admin
+                        </h5>
+                    </div>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a class="nav-link" href="/admin/usuarios">
+                            <i class="bi bi-people"></i>
+                            <span>Usuarios</span>
+                        </a>
+                        <a class="nav-link" href="/admin/libros">
+                            <i class="bi bi-book"></i>
+                            <span>Libros</span>
+                        </a>
+                        <a class="nav-link active" href="/admin/prestamos">
+                            <i class="bi bi-arrow-left-right"></i>
+                            <span>Préstamos</span>
+                        </a>
+                        <a class="nav-link" href="/admin/reportes">
+                            <i class="bi bi-file-text"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content rediseñado -->
+            <div class="col-md-9 col-lg-10 main-content-modern">
+                <div class="content-header" data-aos="fade-right">
+                    <h2>
+                        <i class="bi bi-arrow-left-right me-2" style="color: #1e4a7a;"></i>
+                        Gestión de Préstamos
+                    </h2>
+                    <div class="d-flex gap-3">
+                        <div class="date-badge">
+                            <i class="bi bi-calendar-check"></i>
+                            <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}">20/02/2026</span>
+                        </div>
+                        <button class="btn-modern success" onclick="actualizarVencidos()">
+                            <i class="bi bi-arrow-repeat me-2"></i>
+                            Actualizar Vencidos
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filtros rediseñados -->
+                <div class="row mb-4" data-aos="fade-up">
+                    <div class="col-md-12">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-funnel"></i>
+                                <span>Filtros de Búsqueda</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                            <i class="bi bi-search me-2"></i>Buscar
+                                        </label>
+                                        <div class="input-group" style="box-shadow: var(--shadow-sm); border-radius: 50px; overflow: hidden;">
+                                            <span class="input-group-text bg-white border-0 ps-4">
+                                                <i class="bi bi-search" style="color: #1e4a7a;"></i>
+                                            </span>
+                                            <input type="text" class="form-control border-0 py-2" id="buscarPrestamo" 
+                                                   placeholder="Alumno, libro o código...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                            <i class="bi bi-tag me-2"></i>Estado
+                                        </label>
+                                        <select class="form-select bg-light border-0 py-3 rounded-4" id="filtroEstado">
+                                            <option value="TODOS">📋 Todos</option>
+                                            <option value="ACTIVO">✅ Activos</option>
+                                            <option value="DEVUELTO">↩️ Devueltos</option>
+                                            <option value="VENCIDO">⚠️ Vencidos</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                            <i class="bi bi-calendar me-2"></i>Fecha desde
+                                        </label>
+                                        <input type="date" class="form-control bg-light border-0 py-3 rounded-4" id="fechaDesde">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn-modern primary w-100 py-3" onclick="filtrarPrestamos()">
+                                            <i class="bi bi-search me-2"></i>
+                                            Filtrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pestañas de préstamos rediseñadas -->
+                <ul class="nav nav-tabs border-0 mb-4" id="prestamoTabs" role="tablist" data-aos="fade-up">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link-modern active" id="activos-tab" data-bs-toggle="tab" 
+                                data-bs-target="#activos" type="button" role="tab">
+                            <i class="bi bi-play-circle" style="color: #00c9b7;"></i>
+                            <span>Activos</span>
+                            <span class="badge-modern success ms-2" th:text="${#lists.size(prestamosActivos)}">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link-modern" id="vencidos-tab" data-bs-toggle="tab" 
+                                data-bs-target="#vencidos" type="button" role="tab">
+                            <i class="bi bi-exclamation-triangle" style="color: #ff4757;"></i>
+                            <span>Vencidos</span>
+                            <span class="badge-modern danger ms-2" th:text="${#lists.size(prestamosVencidos)}">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link-modern" id="devueltos-tab" data-bs-toggle="tab" 
+                                data-bs-target="#devueltos" type="button" role="tab">
+                            <i class="bi bi-check-circle" style="color: #1e4a7a;"></i>
+                            <span>Devueltos</span>
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- Contenido de pestañas rediseñado -->
+                <div class="tab-content" id="prestamoTabsContent">
+                    <!-- Préstamos Activos -->
+                    <div class="tab-pane fade show active" id="activos" role="tabpanel" data-aos="fade-up">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-play-circle" style="color: #00c9b7;"></i>
+                                <span>Préstamos Activos</span>
+                                <span class="badge-modern success ms-2" th:text="${#lists.size(prestamosActivos)}">0</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern datatable" id="tablaActivos">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Alumno</th>
+                                                <th>Libro</th>
+                                                <th>Código</th>
+                                                <th>Fecha Préstamo</th>
+                                                <th>Fecha Devolución</th>
+                                                <th>Días Restantes</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="prestamo, iterStat : ${prestamosActivos}"
+                                                style="animation: fadeInUp 0.5s ease" 
+                                                th:styleappend="'animation-delay: ' + (${iterStat.index} * 0.05) + 's;'">
+                                                <td><span class="fw-semibold" th:text="${prestamo.id}">1</span></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="user-avatar small me-2" style="width: 32px; height: 32px; background: #1e4a7a20; color: #1e4a7a;">
+                                                            <i class="bi bi-person"></i>
+                                                        </div>
+                                                        <div>
+                                                            <strong th:text="${prestamo.usuarioNombre}">Juan Pérez</strong>
+                                                            <br>
+                                                            <small class="text-muted" th:text="${prestamo.usuarioEmail}">juan@email.com</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="fw-semibold" th:text="${prestamo.libroNombre}">El principito</td>
+                                                <td>
+                                                    <code class="bg-light p-2 rounded-3" style="color: #1e4a7a;" th:text="${prestamo.libroCodigo}">LIB-001</code>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern" style="background: #e6f0fa; color: #1e4a7a;" 
+                                                          th:text="${prestamo.fechaPrestamoFormatted}">15/02/2026</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern" style="background: #e6f0fa; color: #1e4a7a;" 
+                                                          th:text="${prestamo.fechaDevolucionEstimadaFormatted}">22/02/2026</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern" 
+                                                          th:classappend="${prestamo.diasRestantes > 3 ? 'success' : 
+                                                                           (prestamo.diasRestantes > 0 ? 'warning' : 'danger')}"
+                                                          th:text="${prestamo.diasRestantes} + ' días'">5 días</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm" style="background: #1e4a7a20; color: #1e4a7a; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                                th:onclick="'verDetallePrestamo(' + ${prestamo.id} + ')'"
+                                                                data-bs-toggle="tooltip" title="Ver detalles">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background: #00c9b720; color: #00c9b7; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                                th:onclick="'registrarDevolucion(' + ${prestamo.id} + ')'"
+                                                                data-bs-toggle="tooltip" title="Registrar devolución">
+                                                            <i class="bi bi-arrow-return-left"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Préstamos Vencidos -->
+                    <div class="tab-pane fade" id="vencidos" role="tabpanel" data-aos="fade-up">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-exclamation-triangle" style="color: #ff4757;"></i>
+                                <span>Préstamos Vencidos</span>
+                                <span class="badge-modern danger ms-2" th:text="${#lists.size(prestamosVencidos)}">0</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern datatable" id="tablaVencidos">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Alumno</th>
+                                                <th>Libro</th>
+                                                <th>Fecha Préstamo</th>
+                                                <th>Fecha Devolución</th>
+                                                <th>Días de Retraso</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="prestamo, iterStat : ${prestamosVencidos}"
+                                                style="animation: fadeInUp 0.5s ease" 
+                                                th:styleappend="'animation-delay: ' + (${iterStat.index} * 0.05) + 's;'">
+                                                <td><span class="fw-semibold" th:text="${prestamo.id}">1</span></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="user-avatar small me-2" style="width: 32px; height: 32px; background: #ff475720; color: #ff4757;">
+                                                            <i class="bi bi-person"></i>
+                                                        </div>
+                                                        <div>
+                                                            <strong th:text="${prestamo.usuarioNombre}">Juan Pérez</strong>
+                                                            <br>
+                                                            <small class="text-muted" th:text="${prestamo.usuarioEmail}">juan@email.com</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="fw-semibold" th:text="${prestamo.libroNombre}">El principito</td>
+                                                <td th:text="${prestamo.fechaPrestamoFormatted}">15/02/2026</td>
+                                                <td th:text="${prestamo.fechaDevolucionEstimadaFormatted}">22/02/2026</td>
+                                                <td>
+                                                    <span class="badge-modern danger" th:text="${prestamo.diasRetraso} + ' días'">5 días</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm" style="background: #1e4a7a20; color: #1e4a7a; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                                th:onclick="'verDetallePrestamo(' + ${prestamo.id} + ')'"
+                                                                data-bs-toggle="tooltip" title="Ver detalles">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background: #ffb34720; color: #ffb347; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                                th:onclick="'registrarDevolucion(' + ${prestamo.id} + ')'"
+                                                                data-bs-toggle="tooltip" title="Forzar devolución">
+                                                            <i class="bi bi-arrow-return-left"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Préstamos Devueltos -->
+                    <div class="tab-pane fade" id="devueltos" role="tabpanel" data-aos="fade-up">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-check-circle" style="color: #1e4a7a;"></i>
+                                <span>Préstamos Devueltos</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern datatable" id="tablaDevueltos">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Alumno</th>
+                                                <th>Libro</th>
+                                                <th>Fecha Préstamo</th>
+                                                <th>Fecha Devolución</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="prestamo, iterStat : ${prestamosDevueltos}"
+                                                style="animation: fadeInUp 0.5s ease" 
+                                                th:styleappend="'animation-delay: ' + (${iterStat.index} * 0.05) + 's;'">
+                                                <td><span class="fw-semibold" th:text="${prestamo.id}">1</span></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="user-avatar small me-2" style="width: 32px; height: 32px; background: #1e4a7a20; color: #1e4a7a;">
+                                                            <i class="bi bi-person"></i>
+                                                        </div>
+                                                        <div>
+                                                            <strong th:text="${prestamo.usuarioNombre}">Juan Pérez</strong>
+                                                            <br>
+                                                            <small class="text-muted" th:text="${prestamo.usuarioEmail}">juan@email.com</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="fw-semibold" th:text="${prestamo.libroNombre}">El principito</td>
+                                                <td th:text="${prestamo.fechaPrestamoFormatted}">15/02/2026</td>
+                                                <td th:text="${prestamo.fechaDevolucionRealFormatted}">22/02/2026</td>
+                                                <td>
+                                                    <span class="badge-modern info" th:text="${prestamo.estado}">DEVUELTO</span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm" style="background: #1e4a7a20; color: #1e4a7a; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                            th:onclick="'verDetallePrestamo(' + ${prestamo.id} + ')'"
+                                                            data-bs-toggle="tooltip" title="Ver detalles">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resumen de préstamos -->
+                <div class="row mt-4" data-aos="fade-up">
+                    <div class="col-md-3">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #1e4a7a 0%, #2c6b9e 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${totalPrestamos}">0</div>
+                                    <div class="stat-label">Total Préstamos</div>
+                                </div>
+                                <i class="bi bi-arrow-left-right" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${#lists.size(prestamosActivos)}">0</div>
+                                    <div class="stat-label">Préstamos Activos</div>
+                                </div>
+                                <i class="bi bi-play-circle" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #ffb347 0%, #1e4a7a 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${#lists.size(prestamosVencidos)}">0</div>
+                                    <div class="stat-label">Préstamos Vencidos</div>
+                                </div>
+                                <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #ff4757 0%, #1e4a7a 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${totalDiasRetraso}">0</div>
+                                    <div class="stat-label">Días de Retraso</div>
+                                </div>
+                                <i class="bi bi-clock-history" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Detalle de Préstamo rediseñado -->
+    <div class="modal fade" id="modalDetallePrestamo" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Detalle del Préstamo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" id="detallePrestamoContent">
+                    <!-- Se llena con JavaScript -->
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern primary" data-bs-dismiss="modal">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Devolución rediseñado -->
+    <div class="modal fade" id="modalDevolucion" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-arrow-return-left me-2"></i>
+                        Registrar Devolución
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #00c9b720, #1e4a7a20); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-arrow-return-left" style="font-size: 2.5rem; color: #1e4a7a;"></i>
+                        </div>
+                    </div>
+                    <p class="text-center mb-4">¿Confirmas que el alumno ha devuelto el libro?</p>
+                    <div id="infoDevolucion" class="bg-light p-4 rounded-4"></div>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern outline" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-modern success" id="btnConfirmarDevolucion">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Confirmar Devolución
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Incluir footer rediseñado -->
+    <div th:replace="~{layout/header :: footer}"></div>
+    
+    <script>
+        let prestamoSeleccionado = null;
+        
+        // Función para ver detalle mejorada
+        window.verDetallePrestamo = function(id) {
+            fetch('/api/prestamos/' + id)
+                .then(response => response.json())
+                .then(prestamo => {
+                    let estadoClass = prestamo.estado === 'ACTIVO' ? 'success' : 
+                                     (prestamo.estado === 'VENCIDO' ? 'danger' : 'info');
+                    
+                    let html = `
+                        <div class="text-center mb-4">
+                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-journal-check" style="font-size: 2.5rem; color: #1e4a7a;"></i>
+                            </div>
+                        </div>
+                        <div class="bg-light p-4 rounded-4">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a; width: 40%;">ID Préstamo:</td>
+                                    <td><span class="badge-modern info">${prestamo.id}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Alumno:</td>
+                                    <td class="fw-bold">${prestamo.usuarioNombre}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Email:</td>
+                                    <td><i class="bi bi-envelope me-2" style="color: #1e4a7a;"></i>${prestamo.usuarioEmail}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Libro:</td>
+                                    <td>${prestamo.libroNombre}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Código:</td>
+                                    <td><code class="bg-white p-2 rounded-3" style="color: #1e4a7a;">${prestamo.libroCodigo}</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Fecha Préstamo:</td>
+                                    <td>${prestamo.fechaPrestamoFormatted}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Devolución Estimada:</td>
+                                    <td>${prestamo.fechaDevolucionEstimadaFormatted}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Devolución Real:</td>
+                                    <td>${prestamo.fechaDevolucionReal ? prestamo.fechaDevolucionRealFormatted : '<span class="badge-modern warning">Pendiente</span>'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Estado:</td>
+                                    <td><span class="badge-modern ${estadoClass}">${prestamo.estado}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    `;
+                    
+                    document.getElementById('detallePrestamoContent').innerHTML = html;
+                    new bootstrap.Modal(document.getElementById('modalDetallePrestamo')).show();
+                });
+        };
+        
+        // Función para registrar devolución mejorada
+        window.registrarDevolucion = function(id) {
+            prestamoSeleccionado = id;
+            fetch('/api/prestamos/' + id)
+                .then(response => response.json())
+                .then(prestamo => {
+                    let html = `
+                        <div class="text-start">
+                            <div class="mb-2">
+                                <i class="bi bi-person me-2" style="color: #1e4a7a;"></i>
+                                <strong>Alumno:</strong> ${prestamo.usuarioNombre}
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-book me-2" style="color: #1e4a7a;"></i>
+                                <strong>Libro:</strong> ${prestamo.libroNombre}
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-calendar me-2" style="color: #1e4a7a;"></i>
+                                <strong>Fecha préstamo:</strong> ${prestamo.fechaPrestamoFormatted}
+                            </div>
+                            <div class="mt-3 p-3 rounded-3" style="background: ${prestamo.diasRetraso > 0 ? '#ff475720' : '#00c9b720'}">
+                                <i class="bi ${prestamo.diasRetraso > 0 ? 'bi-exclamation-triangle text-danger' : 'bi-check-circle text-success'} me-2"></i>
+                                <strong>${prestamo.diasRetraso > 0 ? '⚠️ ' + prestamo.diasRetraso + ' días de retraso' : '✅ En fecha'}</strong>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('infoDevolucion').innerHTML = html;
+                    new bootstrap.Modal(document.getElementById('modalDevolucion')).show();
+                });
+        };
+        
+        // Confirmar devolución mejorado
+        document.getElementById('btnConfirmarDevolucion')?.addEventListener('click', function() {
+            if (!prestamoSeleccionado) return;
+            
+            // Mostrar loading
+            Swal.fire({
+                title: 'Procesando...',
+                html: 'Registrando devolución',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch('/api/admin/prestamos/devolver/' + prestamoSeleccionado, {
+                method: 'PUT'
+            })
+            .then(response => {
+                Swal.close();
+                if (response.ok) {
+                    showNotification('✅ Devolución registrada correctamente');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                Swal.close();
+                showNotification('❌ Error: ' + error.message, 'error');
+            });
+            
+            bootstrap.Modal.getInstance(document.getElementById('modalDevolucion')).hide();
+        });
+        
+        // Actualizar préstamos vencidos mejorado
+        window.actualizarVencidos = function() {
+            confirmAction('¿Actualizar el estado de préstamos vencidos?', function() {
+                fetch('/api/admin/prestamos/actualizar-vencidos', {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showNotification('✅ Préstamos vencidos actualizados');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showNotification('❌ Error al actualizar', 'error');
+                    }
+                });
+            });
+        };
+        
+        // Filtrar préstamos mejorado
+        window.filtrarPrestamos = function() {
+            let estado = document.getElementById('filtroEstado').value;
+            let fechaDesde = document.getElementById('fechaDesde').value;
+            
+            let mensaje = 'Filtro aplicado: ';
+            if (estado !== 'TODOS') mensaje += `Estado: ${estado} `;
+            if (fechaDesde) mensaje += `desde ${fechaDesde}`;
+            
+            showNotification(mensaje, 'info');
+            
+            // Aquí implementarías la lógica de filtrado real
+        };
+        
+        // Búsqueda en tiempo real mejorada
+        document.getElementById('buscarPrestamo')?.addEventListener('keyup', function() {
+            let value = this.value.toLowerCase();
+            let tabActiva = document.querySelector('.tab-pane.active');
+            if (!tabActiva) return;
+            
+            let rows = tabActiva.querySelectorAll('table tbody tr');
+            let contador = 0;
+            
+            rows.forEach(row => {
+                let text = row.textContent.toLowerCase();
+                let matches = text.includes(value);
+                row.style.display = matches ? '' : 'none';
+                if (matches) contador++;
+            });
+            
+            // Actualizar contador en el header de la tabla activa
+            let headerTitle = tabActiva.querySelector('.card-header span');
+            if (headerTitle && value.length > 0) {
+                let originalText = headerTitle.textContent.split('(')[0];
+                headerTitle.textContent = `${originalText} (${contador} resultados)`;
+            }
+        });
+    </script>
+</body>
+</html>

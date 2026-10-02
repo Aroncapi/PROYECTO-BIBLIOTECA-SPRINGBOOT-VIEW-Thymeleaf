@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: head('Iniciar Sesión - Biblioteca Escolar')}">
+</head>
+<body class="bg-light">
+    <!-- No incluir navbar en login -->
+    
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center" 
+         style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 50%, #2c6b9e 100%); position: relative; overflow: hidden;">
+        
+        <!-- Elementos decorativos de fondo -->
+        <div style="position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div style="position: absolute; bottom: -80px; left: -80px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div style="position: absolute; top: 30%; left: 10%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,201,183,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+        
+        <div class="container" style="position: relative; z-index: 10;">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card border-0 rounded-5 shadow-lg overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
+                        <!-- Cabecera con degradado -->
+                        <div class="text-center py-5" style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 100%);">
+                            <div class="mb-3">
+                                <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                                    <i class="bi bi-book-half text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                            <h2 class="fw-bold text-white mb-1" style="font-family: 'Poppins', sans-serif;">Bienvenido</h2>
+                            <p class="text-white-50 mb-0">Sistema de Gestión de Préstamos</p>
+                        </div>
+                        
+                        <div class="card-body p-5">
+                            <!-- Mensajes con diseño mejorado -->
+                            <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert" style="background: linear-gradient(135deg, #ff6b6b20, #ff475720); border-left: 4px solid #ff4757;">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Credenciales inválidas. Por favor, intente nuevamente.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            
+                            <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert" style="background: linear-gradient(135deg, #00c9b720, #00a89620); border-left: 4px solid #00c9b7;">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                Ha cerrado sesión correctamente.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+
+                            <form th:action="@{/login}" method="post" class="needs-validation" novalidate>
+                                <div class="mb-4">
+                                    <label for="username" class="form-label fw-semibold text-secondary">
+                                        <i class="bi bi-envelope-fill me-2" style="color: #1e4a7a;"></i>Correo Electrónico
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 rounded-start-4" style="border-color: #dee2e6;">
+                                            <i class="bi bi-envelope" style="color: #1e4a7a;"></i>
+                                        </span>
+                                        <input type="email" class="form-control form-control-lg border-start-0 rounded-end-4" 
+                                               id="username" name="username" required 
+                                               placeholder="correo@ejemplo.com"
+                                               style="padding: 0.8rem 1rem;">
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese su correo electrónico.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="password" class="form-label fw-semibold text-secondary">
+                                        <i class="bi bi-lock-fill me-2" style="color: #1e4a7a;"></i>Contraseña
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 rounded-start-4" style="border-color: #dee2e6;">
+                                            <i class="bi bi-lock" style="color: #1e4a7a;"></i>
+                                        </span>
+                                        <input type="password" class="form-control form-control-lg border-start-0 rounded-end-4" 
+                                               id="password" name="password" required 
+                                               placeholder="••••••••"
+                                               style="padding: 0.8rem 1rem;">
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese su contraseña.
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me" style="cursor: pointer;">
+                                        <label class="form-check-label text-secondary" for="remember-me">Recordarme</label>
+                                    </div>
+                                    <a href="/recuperar-password" class="text-decoration-none" style="color: #1e4a7a;">
+                                        ¿Olvidaste tu contraseña?
+                                    </a>
+                                </div>
+                                
+                                <!-- CSRF Token -->
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                
+                                <button type="submit" class="btn-modern primary w-100 py-3 mb-4 d-flex align-items-center justify-content-center gap-2" style="font-size: 1.1rem;">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                    Iniciar Sesión
+                                </button>
+                                
+                                <div class="text-center position-relative my-4">
+                                    <hr class="text-muted">
+                                    <span class="px-3 bg-white text-muted position-absolute top-50 start-50 translate-middle">o</span>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <p class="text-muted mb-0">
+                                        ¿No tienes una cuenta? 
+                                        <a href="/registro" class="text-decoration-none fw-semibold" style="color: #1e4a7a; border-bottom: 2px solid #1e4a7a20;">
+                                            Regístrate aquí
+                                        </a>
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="card-footer bg-light border-0 text-center py-4" style="background: #f8fafc;">
+                            <small class="text-muted">
+                                <i class="bi bi-shield-lock-check me-2" style="color: #00c9b7;"></i>
+                                Todos los datos están protegidos con encriptación SSL
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Texto adicional -->
+                    <div class="text-center mt-4 text-white-50">
+                        <small>
+                            <i class="bi bi-info-circle me-1"></i>
+                            Acceso solo para personal autorizado y alumnos registrados
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incluir scripts del footer pero sin duplicar -->
+    <div th:replace="~{layout/header :: footer}"></div>
+
+    <script>
+        // Validación del formulario mejorada
+        (function() {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        // Animación de shake en campos inválidos
+                        form.querySelectorAll(':invalid').forEach(field => {
+                            field.style.animation = 'shake 0.5s ease';
+                            setTimeout(() => {
+                                field.style.animation = '';
+                            }, 500);
+                        });
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        // Animación shake personalizada
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

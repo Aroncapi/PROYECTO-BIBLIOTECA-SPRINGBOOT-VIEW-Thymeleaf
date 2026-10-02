@@ -1,0 +1,57 @@
+<!-- Footer rediseñado con estilo azul y degradados -->
+<footer class="footer-modern" th:fragment="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="footer-content py-4">
+                    <p class="mb-2">
+                        &copy; 2026 Biblioteca Escolar. Todos los derechos reservados.
+                    </p>
+                    <small class="text-white-50 d-block mb-3">
+                        <i class="bi bi-code-slash me-1"></i>
+                        Sistema de Gestión de Préstamos v1.0
+                    </small>
+                    
+                    <!-- Separador decorativo -->
+                    <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                        <span style="width: 50px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);"></span>
+                        <i class="bi bi-book-half text-white-50"></i>
+                        <span style="width: 50px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);"></span>
+                    </div>
+                    
+                    <!-- Redes sociales (opcional pero queda bien) -->
+                    <div class="social-links">
+                        <a href="#" class="text-white-50 me-3" data-bs-toggle="tooltip" title="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#" class="text-white-50 me-3" data-bs-toggle="tooltip" title="Twitter">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a href="#" class="text-white-50 me-3" data-bs-toggle="tooltip" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="#" class="text-white-50" data-bs-toggle="tooltip" title="GitHub">
+                            <i class="bi bi-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Versión alternativa más compacta si prefieres menos elementos -->
+<footer class="footer-modern" th:fragment="footer-compact">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center py-4">
+                <p class="mb-1">
+                    &copy; 2026 Biblioteca Escolar. Todos los derechos reservados.
+                </p>
+                <small class="text-white-50">
+                    Sistema de Gestión de Préstamos v1.0
+                </small>
+            </div>
+        </div>
+    </div>
+</footer>

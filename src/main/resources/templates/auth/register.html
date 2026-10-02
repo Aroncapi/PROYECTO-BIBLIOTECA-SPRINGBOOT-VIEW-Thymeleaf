@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: head('Registro - Biblioteca Escolar')}">
+</head>
+<body class="bg-light">
+    <!-- No incluir navbar en registro -->
+    
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-5"
+         style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 50%, #2c6b9e 100%); position: relative; overflow: hidden;">
+        
+        <!-- Elementos decorativos de fondo -->
+        <div style="position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div style="position: absolute; bottom: -80px; left: -80px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div style="position: absolute; top: 30%; left: 10%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,201,183,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+        
+        <div class="container" style="position: relative; z-index: 10;">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card border-0 rounded-5 shadow-lg overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
+                        <!-- Cabecera con degradado -->
+                        <div class="text-center py-5" style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 100%);">
+                            <div class="mb-3">
+                                <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                                    <i class="bi bi-person-plus-fill text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                            <h2 class="fw-bold text-white mb-1" style="font-family: 'Poppins', sans-serif;">Registro de Alumno</h2>
+                            <p class="text-white-50 mb-0">Complete sus datos para registrarse</p>
+                        </div>
+                        
+                        <div class="card-body p-5">
+                            <form id="registerForm" class="needs-validation" novalidate>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="nombre" class="form-label fw-semibold" style="color: #1e4a7a;">
+                                            <i class="bi bi-person me-2"></i>Nombre
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                                <i class="bi bi-person" style="color: #1e4a7a;"></i>
+                                            </span>
+                                            <input type="text" class="form-control border-0 bg-light py-3" 
+                                                   id="nombre" name="nombre" required 
+                                                   placeholder="Ej: Juan">
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Por favor ingrese su nombre.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-4">
+                                        <label for="apellido" class="form-label fw-semibold" style="color: #1e4a7a;">
+                                            <i class="bi bi-person me-2"></i>Apellido
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                                <i class="bi bi-person" style="color: #1e4a7a;"></i>
+                                            </span>
+                                            <input type="text" class="form-control border-0 bg-light py-3" 
+                                                   id="apellido" name="apellido" required 
+                                                   placeholder="Ej: Pérez">
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Por favor ingrese su apellido.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="email" class="form-label fw-semibold" style="color: #1e4a7a;">
+                                        <i class="bi bi-envelope me-2"></i>Correo Electrónico
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                            <i class="bi bi-envelope" style="color: #1e4a7a;"></i>
+                                        </span>
+                                        <input type="email" class="form-control border-0 bg-light py-3" 
+                                               id="email" name="email" required 
+                                               placeholder="ejemplo@email.com">
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese un correo válido.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="password" class="form-label fw-semibold" style="color: #1e4a7a;">
+                                        <i class="bi bi-lock me-2"></i>Contraseña
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                            <i class="bi bi-lock" style="color: #1e4a7a;"></i>
+                                        </span>
+                                        <input type="password" class="form-control border-0 bg-light py-3" 
+                                               id="password" name="password" required minlength="6" 
+                                               placeholder="••••••••">
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1" style="color: #1e4a7a;"></i>
+                                        Mínimo 6 caracteres
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        La contraseña debe tener al menos 6 caracteres.
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-light p-4 rounded-4 mb-4">
+                                    <h6 class="fw-semibold mb-3" style="color: #1e4a7a;">
+                                        <i class="bi bi-backpack me-2"></i>Información Académica
+                                    </h6>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="nivel" class="form-label">Nivel</label>
+                                            <select class="form-select bg-white border-0 py-2" id="nivel" name="nivel" required>
+                                                <option value="">Seleccione...</option>
+                                                <option value="PRIMARIA">🏫 Primaria</option>
+                                                <option value="SECUNDARIA">📚 Secundaria</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Seleccione un nivel.
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label for="grado" class="form-label">Grado</label>
+                                            <select class="form-select bg-white border-0 py-2" id="grado" name="grado" required>
+                                                <option value="">Seleccione...</option>
+                                                <option value="1">1°</option>
+                                                <option value="2">2°</option>
+                                                <option value="3">3°</option>
+                                                <option value="4">4°</option>
+                                                <option value="5">5°</option>
+                                                <option value="6">6°</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Seleccione un grado.
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label for="seccion" class="form-label">Sección</label>
+                                            <select class="form-select bg-white border-0 py-2" id="seccion" name="seccion" required>
+                                                <option value="">Seleccione...</option>
+                                                <option value="A">A</option>
+                                                <option value="B">B</option>
+                                                <option value="C">C</option>
+                                                <option value="D">D</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Seleccione una sección.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Términos y condiciones -->
+                                <div class="mb-4 form-check">
+                                    <input type="checkbox" class="form-check-input" id="terminos" required>
+                                    <label class="form-check-label" for="terminos">
+                                        Acepto los <a href="#" class="text-decoration-none" style="color: #1e4a7a;">términos y condiciones</a> y la <a href="#" class="text-decoration-none" style="color: #1e4a7a;">política de privacidad</a>
+                                    </label>
+                                    <div class="invalid-feedback">
+                                        Debe aceptar los términos para continuar.
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn-modern primary w-100 py-3 mb-4 d-flex align-items-center justify-content-center gap-2" style="font-size: 1.1rem;">
+                                    <i class="bi bi-check-circle"></i>
+                                    Registrarse
+                                </button>
+                                
+                                <div class="text-center position-relative my-4">
+                                    <hr class="text-muted">
+                                    <span class="px-3 bg-white text-muted position-absolute top-50 start-50 translate-middle">o</span>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <p class="text-muted mb-0">
+                                        ¿Ya tienes cuenta? 
+                                        <a href="/login" class="text-decoration-none fw-semibold" style="color: #1e4a7a; border-bottom: 2px solid #1e4a7a20;">
+                                            Inicia Sesión
+                                        </a>
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Beneficios del registro -->
+                        <div class="card-footer bg-light border-0 py-4" style="background: #f8fafc;">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <i class="bi bi-book text-primary" style="font-size: 1.5rem;"></i>
+                                    <small class="d-block text-muted">Acceso a libros</small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="bi bi-clock-history text-success" style="font-size: 1.5rem;"></i>
+                                    <small class="d-block text-muted">Préstamos en línea</small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="bi bi-bell text-warning" style="font-size: 1.5rem;"></i>
+                                    <small class="d-block text-muted">Notificaciones</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Texto de ayuda -->
+                    <div class="text-center mt-4 text-white-50">
+                        <small>
+                            <i class="bi bi-info-circle me-1"></i>
+                            El registro es completamente gratuito para alumnos de la institución
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incluir scripts del footer -->
+    <div th:replace="~{layout/header :: footer}"></div>
+
+    <script>
+        // Validación del formulario mejorada
+        (function() {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        // Animación de shake en campos inválidos
+                        form.querySelectorAll(':invalid').forEach(field => {
+                            field.style.animation = 'shake 0.5s ease';
+                            setTimeout(() => {
+                                field.style.animation = '';
+                            }, 500);
+                        });
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        // Manejar el registro mejorado
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                
+                // Mostrar mensaje de error general
+                showNotification('❌ Por favor complete todos los campos correctamente', 'error');
+                return;
+            }
+            
+            // Verificar términos y condiciones
+            if (!document.getElementById('terminos').checked) {
+                showNotification('❌ Debe aceptar los términos y condiciones', 'warning');
+                return;
+            }
+            
+            let formData = {
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                nivel: document.getElementById('nivel').value,
+                grado: parseInt(document.getElementById('grado').value),
+                seccion: document.getElementById('seccion').value
+            };
+            
+            // Mostrar loading
+            Swal.fire({
+                title: 'Procesando registro...',
+                html: 'Por favor espere',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch('/api/auth/register/alumno', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    Swal.close();
+                    showNotification('✅ Registro exitoso. Por favor inicia sesión.');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                Swal.close();
+                showNotification('❌ Error: ' + error.message, 'error');
+            });
+        });
+        
+        // Validación de contraseña en tiempo real (opcional)
+        document.getElementById('password')?.addEventListener('input', function() {
+            let password = this.value;
+            let isValid = password.length >= 6;
+            
+            if (isValid) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+        
+        // Animación shake personalizada (si no está ya en el header)
+        if (!document.querySelector('#shake-animation')) {
+            const style = document.createElement('style');
+            style.id = 'shake-animation';
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    </script>
+</body>
+</html>

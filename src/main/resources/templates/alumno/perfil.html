@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/header :: head('Mi Perfil - Biblioteca Escolar')}">
+</head>
+<body>
+    <!-- Incluir el navbar rediseñado -->
+    <div th:replace="~{layout/header :: navbar}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Alumno rediseñado -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar-modern">
+                    <div class="sidebar-header">
+                        <h5>
+                            <i class="bi bi-person"></i>
+                            Panel Alumno
+                        </h5>
+                    </div>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="/alumno/catalogo">
+                            <i class="bi bi-book"></i>
+                            <span>Catálogo</span>
+                        </a>
+                        <a class="nav-link" href="/alumno/mis-prestamos">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Mis Préstamos</span>
+                        </a>
+                        <a class="nav-link active" href="/alumno/perfil">
+                            <i class="bi bi-person"></i>
+                            <span>Mi Perfil</span>
+                        </a>
+                    </nav>
+                    
+                    <!-- Info adicional en sidebar -->
+                    <div class="sidebar-header mt-4">
+                        <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.1);">
+                            <small class="text-white-50 d-block mb-2">Membresía</small>
+                            <div class="d-flex align-items-center text-white">
+                                <i class="bi bi-award me-2" style="color: #ffb347;"></i>
+                                <span th:text="${#lists.size(totalPrestamos) > 10 ? 'Lector Avanzado' : 'Lector Inicial'}">Lector Inicial</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content rediseñado -->
+            <div class="col-md-9 col-lg-10 main-content-modern">
+                <div class="content-header" data-aos="fade-right">
+                    <h2>
+                        <i class="bi bi-person-circle me-2" style="color: #1e4a7a;"></i>
+                        Mi Perfil
+                    </h2>
+                    <div class="date-badge">
+                        <i class="bi bi-calendar-check"></i>
+                        <span th:text="${#dates.format(#dates.createNow(), 'dd MMMM yyyy')}">21 febrero 2026</span>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Tarjeta de perfil rediseñada -->
+                    <div class="col-md-4" data-aos="fade-right">
+                        <div class="card-modern text-center">
+                            <div class="card-body p-4">
+                                <!-- Avatar con degradado -->
+                                <div class="mb-4">
+                                    <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #1e4a7a, #00c9b7); border-radius: 30px; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+                                        <i class="bi bi-person-circle text-white" style="font-size: 4rem;"></i>
+                                    </div>
+                                </div>
+                                
+                                <h3 class="fw-bold mb-2" th:text="${usuario.nombre + ' ' + usuario.apellido}">Juan Pérez</h3>
+                                <p class="text-muted mb-3" th:text="${usuario.email}">juan@email.com</p>
+                                
+                                <span class="badge-modern success mb-4 px-4 py-2" style="font-size: 0.9rem;">
+                                    <i class="bi bi-mortarboard me-2"></i>
+                                    ALUMNO
+                                </span>
+                                
+                                <div class="bg-light p-3 rounded-4 mb-4">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-backpack me-2" style="color: #1e4a7a; font-size: 1.2rem;"></i>
+                                        <span class="fw-semibold" th:text="'Nivel: ' + ${usuario.nivel} + ' - ' + ${usuario.grado} + '° ' + ${usuario.seccion}">
+                                            Primaria - 5° A
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn-modern primary w-100 py-3" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
+                                    <i class="bi bi-pencil me-2"></i>
+                                    Editar Perfil
+                                </button>
+                                
+                                <!-- Insignias (opcional) -->
+                                <div class="mt-4 pt-3 border-top">
+                                    <small class="text-muted d-block mb-2">Logros obtenidos</small>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <div class="badge-modern success" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" title="Primer préstamo">
+                                            <i class="bi bi-bookmark-star"></i>
+                                        </div>
+                                        <div class="badge-modern info" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" title="Lector constante">
+                                            <i class="bi bi-clock-history"></i>
+                                        </div>
+                                        <div class="badge-modern warning" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" title="5 libros prestados">
+                                            <i class="bi bi-star"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estadísticas del alumno rediseñadas -->
+                    <div class="col-md-8" data-aos="fade-left">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-bar-chart-line me-2"></i>
+                                <span>Mis Estadísticas</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #1e4a7a 0%, #2c6b9e 100%);">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="stat-number" th:text="${totalPrestamos}">10</div>
+                                                    <div class="stat-label">Total Préstamos</div>
+                                                </div>
+                                                <i class="bi bi-book" style="font-size: 2rem;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="stat-number" th:text="${prestamosActivos}">3</div>
+                                                    <div class="stat-label">Préstamos Activos</div>
+                                                </div>
+                                                <i class="bi bi-play-circle" style="font-size: 2rem;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #ffb347 0%, #1e4a7a 100%);">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="stat-number" th:text="${prestamosDevueltos}">7</div>
+                                                    <div class="stat-label">Devueltos</div>
+                                                </div>
+                                                <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Gráfico de actividad (simulado) -->
+                                <div class="mt-4 mb-4">
+                                    <h5 class="fw-semibold mb-3" style="color: #1e4a7a;">
+                                        <i class="bi bi-graph-up me-2"></i>
+                                        Actividad mensual
+                                    </h5>
+                                    <div class="d-flex gap-2 align-items-end" style="height: 100px;">
+                                        <div style="flex: 1; height: 40px; background: linear-gradient(180deg, #1e4a7a, #2c6b9e); border-radius: 10px 10px 0 0;" data-bs-toggle="tooltip" title="Enero: 2 préstamos"></div>
+                                        <div style="flex: 1; height: 60px; background: linear-gradient(180deg, #1e4a7a, #2c6b9e); border-radius: 10px 10px 0 0;" data-bs-toggle="tooltip" title="Febrero: 3 préstamos"></div>
+                                        <div style="flex: 1; height: 80px; background: linear-gradient(180deg, #1e4a7a, #2c6b9e); border-radius: 10px 10px 0 0;" data-bs-toggle="tooltip" title="Marzo: 4 préstamos"></div>
+                                        <div style="flex: 1; height: 30px; background: linear-gradient(180deg, #1e4a7a, #2c6b9e); border-radius: 10px 10px 0 0;" data-bs-toggle="tooltip" title="Abril: 1 préstamo"></div>
+                                        <div style="flex: 1; height: 50px; background: linear-gradient(180deg, #1e4a7a, #2c6b9e); border-radius: 10px 10px 0 0;" data-bs-toggle="tooltip" title="Mayo: 2 préstamos"></div>
+                                        <div style="flex: 1; height: 70px; background: linear-gradient(180deg, #1e4a7a, #2c6b9e); border-radius: 10px 10px 0 0;" data-bs-toggle="tooltip" title="Junio: 3 préstamos"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2 text-muted small">
+                                        <span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span>
+                                    </div>
+                                </div>
+                                
+                                <h5 class="fw-semibold mb-3" style="color: #1e4a7a;">
+                                    <i class="bi bi-clock-history me-2"></i>
+                                    Últimos Préstamos
+                                </h5>
+                                
+                                <div class="table-responsive">
+                                    <table class="table-modern">
+                                        <thead>
+                                            <tr>
+                                                <th>Libro</th>
+                                                <th>Fecha</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="prestamo, iterStat : ${ultimosPrestamos}"
+                                                style="animation: fadeInUp 0.5s ease" 
+                                                th:styleappend="'animation-delay: ' + (${iterStat.index} * 0.1) + 's;'">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="me-2">
+                                                            <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="bi bi-book" style="color: #1e4a7a; font-size: 0.9rem;"></i>
+                                                            </div>
+                                                        </div>
+                                                        <span class="fw-semibold" th:text="${prestamo.libroNombre}">El principito</span>
+                                                    </div>
+                                                </td>
+                                                <td th:text="${prestamo.fechaPrestamoFormatted}">15/02/2026</td>
+                                                <td>
+                                                    <span class="badge-modern" 
+                                                          th:classappend="${prestamo.estado == 'ACTIVO' ? 'success' : 
+                                                                           (prestamo.estado == 'VENCIDO' ? 'danger' : 'info')}"
+                                                          th:text="${prestamo.estado}">ACTIVO</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Ver todos los préstamos -->
+                                <div class="text-end mt-3">
+                                    <a href="/alumno/mis-prestamos" class="btn-modern outline py-2 px-4">
+                                        <i class="bi bi-arrow-right me-2"></i>
+                                        Ver todos mis préstamos
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recomendaciones (opcional) -->
+                        <div class="card-modern mt-4" data-aos="fade-up">
+                            <div class="card-header">
+                                <i class="bi bi-lightbulb me-2" style="color: #ffb347;"></i>
+                                <span>Recomendaciones para ti</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-book" style="color: #1e4a7a;"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted d-block">Basado en tus lecturas</small>
+                                                <span class="fw-semibold">Cien años de soledad</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-book" style="color: #1e4a7a;"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted d-block">Más prestado de tu categoría</small>
+                                                <span class="fw-semibold">Harry Potter</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-book" style="color: #1e4a7a;"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted d-block">Novedad</small>
+                                                <span class="fw-semibold">El principito</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Editar Perfil rediseñado -->
+    <div class="modal fade" id="modalEditarPerfil" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Editar Perfil
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formEditarPerfil" class="needs-validation" novalidate>
+                        <div class="text-center mb-4">
+                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-person-circle" style="font-size: 2.5rem; color: #1e4a7a;"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-person me-2"></i>Nombre
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-person" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-light py-3" 
+                                       id="editNombre" th:value="${usuario.nombre}" required 
+                                       placeholder="Tu nombre">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-person me-2"></i>Apellido
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-person" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-light py-3" 
+                                       id="editApellido" th:value="${usuario.apellido}" required 
+                                       placeholder="Tu apellido">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-envelope me-2"></i>Email
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-envelope" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="email" class="form-control border-0 bg-light py-3" 
+                                       id="editEmail" th:value="${usuario.email}" required 
+                                       placeholder="correo@ejemplo.com">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-lock me-2"></i>Nueva Contraseña
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-lock" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="password" class="form-control border-0 bg-light py-3" 
+                                       id="editPassword" placeholder="Dejar en blanco para no cambiar">
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Mínimo 6 caracteres
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern outline" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-modern primary" onclick="guardarPerfil()">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Incluir footer rediseñado -->
+    <div th:replace="~{layout/header :: footer}"></div>
+    
+    <script>
+    function guardarPerfil() {
+        let form = document.getElementById('formEditarPerfil');
+        
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            
+            // Animación de shake en campos inválidos
+            form.querySelectorAll(':invalid').forEach(field => {
+                field.style.animation = 'shake 0.5s ease';
+                setTimeout(() => {
+                    field.style.animation = '';
+                }, 500);
+            });
+            return;
+        }
+        
+        let data = {
+            nombre: document.getElementById('editNombre').value,
+            apellido: document.getElementById('editApellido').value,
+            email: document.getElementById('editEmail').value,
+            password: document.getElementById('editPassword').value
+        };
+        
+        // Mostrar loading
+        Swal.fire({
+            title: 'Guardando cambios...',
+            html: 'Por favor espere',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        fetch('/api/usuarios/perfil', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.close();
+            if (data.error) {
+                showNotification('❌ Error: ' + data.error, 'error');
+            } else {
+                showNotification('✅ ' + (data.message || 'Perfil actualizado correctamente'));
+                setTimeout(() => location.reload(), 1500);
+            }
+        })
+        .catch(error => {
+            Swal.close();
+            showNotification('❌ Error de conexión: ' + error.message, 'error');
+        });
+        
+        // Cerrar modal
+        bootstrap.Modal.getInstance(document.getElementById('modalEditarPerfil')).hide();
+    }
+    
+    // Inicializar tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+    </script>
+</body>
+</html>

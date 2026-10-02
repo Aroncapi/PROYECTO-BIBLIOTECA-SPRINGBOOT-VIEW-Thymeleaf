@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: head('Gestión de Usuarios - Biblioteca Escolar')}">
+</head>
+<body>
+    <!-- Incluir navbar rediseñado -->
+    <div th:replace="~{layout/header :: navbar}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar rediseñado -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar-modern">
+                    <div class="sidebar-header">
+                        <h5>
+                            <i class="bi bi-person-badge"></i>
+                            Panel Admin
+                        </h5>
+                    </div>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a class="nav-link active" href="/admin/usuarios">
+                            <i class="bi bi-people"></i>
+                            <span>Usuarios</span>
+                        </a>
+                        <a class="nav-link" href="/admin/libros">
+                            <i class="bi bi-book"></i>
+                            <span>Libros</span>
+                        </a>
+                        <a class="nav-link" href="/admin/prestamos">
+                            <i class="bi bi-arrow-left-right"></i>
+                            <span>Préstamos</span>
+                        </a>
+                        <a class="nav-link" href="/admin/reportes">
+                            <i class="bi bi-file-text"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content rediseñado -->
+            <div class="col-md-9 col-lg-10 main-content-modern">
+                <div class="content-header" data-aos="fade-right">
+                    <h2>
+                        <i class="bi bi-people me-2" style="color: #1e4a7a;"></i>
+                        Gestión de Usuarios
+                    </h2>
+                    <div class="d-flex gap-3">
+                        <div class="date-badge">
+                            <i class="bi bi-person-check"></i>
+                            <span th:text="'Total: ' + (${#lists.size(alumnos)} + ${#lists.size(administradores)})">0</span>
+                        </div>
+                        <button class="btn-modern primary" data-bs-toggle="modal" data-bs-target="#modalUsuario">
+                            <i class="bi bi-plus-circle"></i>
+                            Nuevo Usuario
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tabs rediseñados -->
+                <ul class="nav nav-tabs border-0 mb-4" id="userTabs" role="tablist" data-aos="fade-up">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link-modern active" id="alumnos-tab" data-bs-toggle="tab" 
+                                data-bs-target="#alumnos" type="button" role="tab">
+                            <i class="bi bi-person"></i>
+                            <span>Alumnos</span>
+                            <span class="badge-modern info ms-2" th:text="${#lists.size(alumnos)}">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link-modern" id="admins-tab" data-bs-toggle="tab" 
+                                data-bs-target="#admins" type="button" role="tab">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Administradores</span>
+                            <span class="badge-modern info ms-2" th:text="${#lists.size(administradores)}">0</span>
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- Tab Content -->
+                <div class="tab-content" id="userTabsContent">
+                    <!-- Alumnos Tab -->
+                    <div class="tab-pane fade show active" id="alumnos" role="tabpanel" data-aos="fade-up">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <i class="bi bi-people me-2"></i>
+                                        <span>Lista de Alumnos</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group" style="box-shadow: var(--shadow-sm); border-radius: 50px; overflow: hidden;">
+                                            <span class="input-group-text bg-white border-0 ps-4">
+                                                <i class="bi bi-search" style="color: #1e4a7a;"></i>
+                                            </span>
+                                            <input type="text" class="form-control border-0 py-2" id="buscarAlumno" 
+                                                   placeholder="Buscar alumno por nombre, email...">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern datatable" id="tablaAlumnos">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nombre</th>
+                                                <th>Apellido</th>
+                                                <th>Email</th>
+                                                <th>Nivel</th>
+                                                <th>Grado</th>
+                                                <th>Sección</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="alumno, iterStat : ${alumnos}" 
+                                                style="animation: fadeInUp 0.5s ease" 
+                                                th:styleappend="'animation-delay: ' + (${iterStat.index} * 0.05) + 's;'">
+                                                <td><span class="fw-semibold" th:text="${alumno.id}">1</span></td>
+                                                <td th:text="${alumno.nombre}">Juan</td>
+                                                <td th:text="${alumno.apellido}">Pérez</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-envelope me-2" style="color: #1e4a7a;"></i>
+                                                        <span th:text="${alumno.email}">juan@email.com</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern info" th:text="${alumno.nivel}">PRIMARIA</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern" style="background: #e6f0fa; color: #1e4a7a;" 
+                                                          th:text="${alumno.grado + '°'}">5°</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern" style="background: #00c9b720; color: #00c9b7;" 
+                                                          th:text="${alumno.seccion}">A</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm" style="background: #ffb34720; color: #ffb347; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                                th:onclick="'editarUsuario(' + ${alumno.id} + ')'"
+                                                                data-bs-toggle="tooltip" title="Editar usuario">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background: #ff475720; color: #ff4757; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                                th:onclick="'eliminarUsuario(' + ${alumno.id} + ')'"
+                                                                data-bs-toggle="tooltip" title="Eliminar usuario">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background: #1e4a7a20; color: #1e4a7a; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                                th:onclick="'verDetalleUsuario(' + ${alumno.id} + ')'"
+                                                                data-bs-toggle="tooltip" title="Ver detalles">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Administradores Tab -->
+                    <div class="tab-pane fade" id="admins" role="tabpanel" data-aos="fade-up">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-person-badge me-2"></i>
+                                <span>Lista de Administradores</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern datatable">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nombre</th>
+                                                <th>Apellido</th>
+                                                <th>Email</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="admin, iterStat : ${administradores}"
+                                                style="animation: fadeInUp 0.5s ease" 
+                                                th:styleappend="'animation-delay: ' + (${iterStat.index} * 0.05) + 's;'">
+                                                <td><span class="fw-semibold" th:text="${admin.id}">1</span></td>
+                                                <td th:text="${admin.nombre}">Admin</td>
+                                                <td th:text="${admin.apellido}">Principal</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-envelope me-2" style="color: #1e4a7a;"></i>
+                                                        <span th:text="${admin.email}">admin@email.com</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm" style="background: #ffb34720; color: #ffb347; border: none; padding: 8px 12px; border-radius: 12px;"
+                                                                data-bs-toggle="tooltip" title="Editar administrador">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background: #ff475720; color: #ff4757; border: none; padding: 8px 12px; border-radius: 12px;"
+                                                                data-bs-toggle="tooltip" title="Eliminar administrador">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Estadísticas rápidas -->
+                <div class="row mt-4" data-aos="fade-up">
+                    <div class="col-md-4">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #1e4a7a 0%, #2c6b9e 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${#lists.size(alumnos)}">0</div>
+                                    <div class="stat-label">Total Alumnos</div>
+                                </div>
+                                <i class="bi bi-people" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${#lists.size(administradores)}">0</div>
+                                    <div class="stat-label">Administradores</div>
+                                </div>
+                                <i class="bi bi-person-badge" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #ffb347 0%, #1e4a7a 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${alumnosActivos}">0</div>
+                                    <div class="stat-label">Alumnos Activos</div>
+                                </div>
+                                <i class="bi bi-check-circle" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Usuario rediseñado -->
+    <div class="modal fade" id="modalUsuario" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-person-plus me-2"></i>
+                        <span id="modalTitle">Nuevo Usuario</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formUsuario" th:action="@{/api/admin/usuarios/alumno}" method="post" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                    <i class="bi bi-person me-2"></i>Nombre
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                        <i class="bi bi-person" style="color: #1e4a7a;"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-0 bg-light py-3" 
+                                           name="nombre" required placeholder="Ej: Juan">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                    <i class="bi bi-person me-2"></i>Apellido
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                        <i class="bi bi-person" style="color: #1e4a7a;"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-0 bg-light py-3" 
+                                           name="apellido" required placeholder="Ej: Pérez">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-envelope me-2"></i>Email
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-envelope" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="email" class="form-control border-0 bg-light py-3" 
+                                       name="email" required placeholder="ejemplo@email.com">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-lock me-2"></i>Contraseña
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-lock" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="password" class="form-control border-0 bg-light py-3" 
+                                       name="password" required placeholder="••••••••">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-person-badge me-2"></i>Tipo de Usuario
+                            </label>
+                            <select class="form-select bg-light border-0 py-3 rounded-4" name="rol" id="tipoUsuario" required>
+                                <option value="ALUMNO">👨‍🎓 Alumno</option>
+                                <option value="ADMIN">👑 Administrador</option>
+                            </select>
+                        </div>
+                        
+                        <div id="camposAlumno" class="bg-light p-4 rounded-4">
+                            <h6 class="fw-semibold mb-3" style="color: #1e4a7a;">
+                                <i class="bi bi-backpack me-2"></i>Información Académica
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Nivel</label>
+                                    <select class="form-select" name="nivel">
+                                        <option value="PRIMARIA">🏫 Primaria</option>
+                                        <option value="SECUNDARIA">📚 Secundaria</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Grado</label>
+                                    <select class="form-select" name="grado">
+                                        <option value="1">1°</option>
+                                        <option value="2">2°</option>
+                                        <option value="3">3°</option>
+                                        <option value="4">4°</option>
+                                        <option value="5">5°</option>
+                                        <option value="6">6°</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Sección</label>
+                                    <select class="form-select" name="seccion">
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern outline" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" form="formUsuario" class="btn-modern primary">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Guardar Usuario
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para ver detalle de usuario -->
+    <div class="modal fade" id="modalDetalleUsuario" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Detalle del Usuario
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" id="detalleUsuarioContent">
+                    <!-- Se llena con JavaScript -->
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern primary" data-bs-dismiss="modal">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Incluir footer rediseñado -->
+    <div th:replace="~{layout/header :: footer}"></div>
+    
+    <script>
+        // Mostrar/ocultar campos según tipo de usuario
+        document.getElementById('tipoUsuario')?.addEventListener('change', function() {
+            var camposAlumno = document.getElementById('camposAlumno');
+            if (this.value === 'ALUMNO') {
+                camposAlumno.style.display = 'block';
+                camposAlumno.style.animation = 'fadeInUp 0.5s ease';
+            } else {
+                camposAlumno.style.display = 'none';
+            }
+        });
+        
+        // Función para eliminar usuario mejorada
+        window.eliminarUsuario = function(id) {
+            confirmAction('¿Estás seguro de eliminar este usuario? Esta acción no se puede deshacer.', function() {
+                fetch('/api/admin/usuarios/' + id, {
+                    method: 'DELETE'
+                }).then(response => {
+                    if (response.ok) {
+                        showNotification('✅ Usuario eliminado correctamente');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showNotification('❌ Error al eliminar usuario', 'error');
+                    }
+                });
+            });
+        }
+        
+        // Función para editar usuario mejorada
+        window.editarUsuario = function(id) {
+            showNotification('Función de edición próximamente', 'info');
+            // Aquí iría la lógica para cargar datos y abrir modal de edición
+        }
+        
+        // Función para ver detalle de usuario
+        window.verDetalleUsuario = function(id) {
+            // Simular carga de datos (reemplazar con fetch real)
+            setTimeout(() => {
+                // Esto debería venir de una API
+                let usuario = {
+                    id: id,
+                    nombre: 'Juan',
+                    apellido: 'Pérez',
+                    email: 'juan@email.com',
+                    nivel: 'PRIMARIA',
+                    grado: '5',
+                    seccion: 'A',
+                    tipo: 'ALUMNO'
+                };
+                
+                let html = `
+                    <div class="text-center mb-4">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-person-circle" style="font-size: 2.5rem; color: #1e4a7a;"></i>
+                        </div>
+                    </div>
+                    <div class="bg-light p-4 rounded-4">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="fw-semibold" style="color: #1e4a7a; width: 40%;">ID:</td>
+                                <td><span class="badge-modern info">${usuario.id}</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold" style="color: #1e4a7a;">Nombre Completo:</td>
+                                <td class="fw-bold">${usuario.nombre} ${usuario.apellido}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold" style="color: #1e4a7a;">Email:</td>
+                                <td><i class="bi bi-envelope me-2" style="color: #1e4a7a;"></i>${usuario.email}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold" style="color: #1e4a7a;">Tipo:</td>
+                                <td><span class="badge-modern info">${usuario.tipo}</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold" style="color: #1e4a7a;">Nivel:</td>
+                                <td><span class="badge-modern info">${usuario.nivel}</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold" style="color: #1e4a7a;">Grado y Sección:</td>
+                                <td><span class="badge-modern" style="background: #e6f0fa; color: #1e4a7a;">${usuario.grado}° ${usuario.seccion}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+                
+                document.getElementById('detalleUsuarioContent').innerHTML = html;
+                let modal = new bootstrap.Modal(document.getElementById('modalDetalleUsuario'));
+                modal.show();
+            }, 300);
+        }
+        
+        // Búsqueda en tiempo real mejorada
+        document.getElementById('buscarAlumno')?.addEventListener('keyup', function() {
+            var value = this.value.toLowerCase();
+            var rows = document.querySelectorAll('#tablaAlumnos tbody tr');
+            var contador = 0;
+            
+            rows.forEach(row => {
+                var text = row.textContent.toLowerCase();
+                var matches = text.includes(value);
+                row.style.display = matches ? '' : 'none';
+                if (matches) contador++;
+            });
+            
+            // Mostrar resultado de búsqueda
+            let resultadoBusqueda = document.querySelector('#alumnos .card-header span');
+            if (resultadoBusqueda) {
+                if (value.length > 0) {
+                    resultadoBusqueda.textContent = `Mostrando ${contador} de ${rows.length} alumnos`;
+                } else {
+                    resultadoBusqueda.textContent = 'Lista de Alumnos';
+                }
+            }
+        });
+        
+        // Validación del formulario
+        (function() {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        form.querySelectorAll(':invalid').forEach(field => {
+                            field.style.animation = 'shake 0.5s ease';
+                            setTimeout(() => {
+                                field.style.animation = '';
+                            }, 500);
+                        });
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+</body>
+</html>

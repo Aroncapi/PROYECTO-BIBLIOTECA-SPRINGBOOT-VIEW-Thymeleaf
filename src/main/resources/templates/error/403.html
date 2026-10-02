@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: head('Acceso Denegado - Biblioteca Escolar')}">
+</head>
+<body>
+    <div class="min-vh-100 d-flex align-items-center justify-content-center"
+         style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 100%);">
+        
+        <div class="container text-center">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <!-- Tarjeta simple -->
+                    <div class="card border-0 rounded-5 shadow-lg p-5">
+                        <div class="mb-4">
+                            <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #ff4757, #ff6b6b); border-radius: 25px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-shield-lock-fill text-white" style="font-size: 3rem;"></i>
+                            </div>
+                        </div>
+                        
+                        <h1 class="display-1 fw-bold" style="color: #ff4757;">403</h1>
+                        <h2 class="fw-bold mb-3" style="color: #1e4a7a;">Acceso Denegado</h2>
+                        <p class="lead text-muted mb-4">No tienes permiso para acceder a esta página.</p>
+                        
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/" class="btn-modern primary">
+                                <i class="bi bi-house-door me-2"></i>
+                                Volver al Inicio
+                            </a>
+                            <a href="/login" class="btn-modern outline">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Iniciar Sesión
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{layout/header :: footer}"></div>
+</body>
+</html>

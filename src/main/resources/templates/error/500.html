@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: head('Error Interno - Biblioteca Escolar')}">
+</head>
+<body>
+    <!-- Fondo con degradado -->
+    <div class="min-vh-100 d-flex align-items-center justify-content-center"
+         style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 50%, #2c6b9e 100%); position: relative; overflow: hidden;">
+        
+        <!-- Elementos decorativos de fondo -->
+        <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div style="position: absolute; bottom: -100px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div style="position: absolute; top: 30%; left: 10%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,71,87,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+        
+        <!-- Contenido principal -->
+        <div class="container text-center" style="position: relative; z-index: 10;">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <!-- Tarjeta de error -->
+                    <div class="card border-0 rounded-5 shadow-lg overflow-hidden" data-aos="fade-up" data-aos-duration="1000">
+                        <!-- Cabecera con degradado naranja/rojo (para indicar error crítico) -->
+                        <div class="py-5" style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);">
+                            <div class="mb-3">
+                                <div style="width: 120px; height: 120px; background: rgba(255,255,255,0.2); border-radius: 30px; margin: 0 auto; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                                    <i class="bi bi-exclamation-triangle-fill text-white" style="font-size: 4rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-5">
+                            <!-- Código de error -->
+                            <div class="display-1 fw-bold mb-3" style="color: #ff6b6b; font-family: 'Poppins', sans-serif; text-shadow: 0 10px 20px rgba(255,107,107,0.3);">
+                                500
+                            </div>
+                            
+                            <!-- Título -->
+                            <h2 class="fw-bold mb-3" style="color: #1e4a7a; font-size: 2rem;">
+                                <i class="bi bi-exclamation-circle-fill me-2" style="color: #ff6b6b;"></i>
+                                Error Interno del Servidor
+                            </h2>
+                            
+                            <!-- Descripción -->
+                            <p class="lead text-muted mb-4" style="font-size: 1.2rem;">
+                                Ha ocurrido un error inesperado. Nuestro equipo ha sido notificado y estamos trabajando para solucionarlo.
+                            </p>
+                            
+                            <!-- Ícono de engranaje animado (opcional) -->
+                            <div class="mb-4">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff6b6b20, #1e4a7a20); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-gear-fill" style="font-size: 2.5rem; color: #ff6b6b; animation: spin 4s linear infinite;"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Posibles soluciones -->
+                            <div class="bg-light p-4 rounded-4 mb-4 text-start">
+                                <h6 class="fw-semibold mb-3" style="color: #1e4a7a;">
+                                    <i class="bi bi-lightbulb me-2"></i>
+                                    Mientras tanto, puedes intentar:
+                                </h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">
+                                        <i class="bi bi-arrow-repeat me-2" style="color: #ff6b6b;"></i>
+                                        Recargar la página
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-clock me-2" style="color: #ff6b6b;"></i>
+                                        Esperar unos minutos y volver a intentar
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-house me-2" style="color: #ff6b6b;"></i>
+                                        Volver al inicio
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-envelope me-2" style="color: #ff6b6b;"></i>
+                                        Contactar al soporte técnico
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Detalles del error (si están disponibles) -->
+                            <div class="mb-4" th:if="${error}">
+                                <div class="alert alert-danger rounded-4 border-0" style="background: #ff6b6b20; border-left: 4px solid #ff6b6b;">
+                                    <small>
+                                        <i class="bi bi-bug me-2"></i>
+                                        <strong>Detalles del error:</strong> <span th:text="${error}">Error desconocido</span>
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4" th:if="${message}">
+                                <div class="alert alert-warning rounded-4 border-0" style="background: #ffb34720; border-left: 4px solid #ffb347;">
+                                    <small>
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <span th:text="${message}">Mensaje adicional</span>
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <!-- Acciones recomendadas -->
+                            <div class="d-flex justify-content-center gap-3">
+                                <a href="javascript:location.reload()" class="btn-modern warning py-3 px-4">
+                                    <i class="bi bi-arrow-repeat me-2"></i>
+                                    Reintentar
+                                </a>
+                                <a href="/" class="btn-modern primary py-3 px-4">
+                                    <i class="bi bi-house-door me-2"></i>
+                                    Ir al Inicio
+                                </a>
+                            </div>
+                            
+                            <!-- Ayuda adicional -->
+                            <div class="mt-4 pt-3 border-top">
+                                <small class="text-muted">
+                                    <i class="bi bi-question-circle me-1"></i>
+                                    ¿El problema persiste? 
+                                    <a href="#" class="text-decoration-none" style="color: #1e4a7a;">Reporta este error</a>
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer de la tarjeta con ID de error -->
+                        <div class="card-footer bg-light border-0 py-3" style="background: #f8fafc;">
+                            <small class="text-muted">
+                                <i class="bi bi-upc-scan me-1" style="color: #ff6b6b;"></i>
+                                ID de error: <span th:text="${#dates.format(#dates.createNow(), 'yyyyMMddHHmmss')}">20250221235959</span>
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Enlace para volver atrás -->
+                    <div class="mt-4">
+                        <a href="javascript:history.back()" class="text-white-50 text-decoration-none">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Volver a la página anterior
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animación para el engranaje -->
+    <style>
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
+    <!-- Incluir scripts del footer -->
+    <div th:replace="~{layout/header :: footer}"></div>
+</body>
+</html>

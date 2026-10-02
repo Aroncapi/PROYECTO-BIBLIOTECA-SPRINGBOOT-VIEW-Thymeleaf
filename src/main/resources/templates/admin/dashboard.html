@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/header :: head('Dashboard Administrador - Biblioteca Escolar')}">
+</head>
+<body>
+    <!-- Incluir el navbar rediseñado -->
+    <div th:replace="~{layout/header :: navbar}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar rediseñado -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar-modern">
+                    <div class="sidebar-header">
+                        <h5>
+                            <i class="bi bi-person-badge"></i>
+                            Panel Admin
+                        </h5>
+                    </div>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="/admin/dashboard">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a class="nav-link" href="/admin/usuarios">
+                            <i class="bi bi-people"></i>
+                            <span>Usuarios</span>
+                        </a>
+                        <a class="nav-link" href="/admin/libros">
+                            <i class="bi bi-book"></i>
+                            <span>Libros</span>
+                        </a>
+                        <a class="nav-link" href="/admin/prestamos">
+                            <i class="bi bi-arrow-left-right"></i>
+                            <span>Préstamos</span>
+                        </a>
+                        <a class="nav-link" href="/admin/reportes">
+                            <i class="bi bi-file-text"></i>
+                            <span>Reportes</span>
+                        </a>
+                        <a class="nav-link" href="/admin/configuracion">
+                            <i class="bi bi-gear"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </nav>
+                    
+                    <!-- Info adicional en sidebar -->
+                    <div class="sidebar-header mt-4">
+                        <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.1);">
+                            <small class="text-white-50 d-block mb-2">Biblioteca activa</small>
+                            <div class="d-flex align-items-center text-white">
+                                <i class="bi bi-clock-history me-2"></i>
+                                <span th:text="${#dates.format(#dates.createNow(), 'HH:mm')}">14:30</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content rediseñado -->
+            <div class="col-md-9 col-lg-10 main-content-modern">
+                <div class="content-header" data-aos="fade-right">
+                    <h2>
+                        <i class="bi bi-speedometer2 me-2" style="color: #1e4a7a;"></i>
+                        Dashboard
+                    </h2>
+                    <div class="date-badge">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="fecha-actual"></span>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards rediseñados con animaciones -->
+                <div class="row mb-4">
+                    <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                        <div class="stat-card-modern">
+                            <div class="stat-icon">
+                                <i class="bi bi-book"></i>
+                            </div>
+                            <div class="stat-number" th:text="${totalLibros}">0</div>
+                            <div class="stat-label">Total Libros</div>
+                            <div class="stat-trend">
+                                <i class="bi bi-arrow-up"></i> +12%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                        <div class="stat-card-modern variant-2">
+                            <div class="stat-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="stat-number" th:text="${totalAlumnos}">0</div>
+                            <div class="stat-label">Total Alumnos</div>
+                            <div class="stat-trend">
+                                <i class="bi bi-arrow-up"></i> +8%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                        <div class="stat-card-modern variant-3">
+                            <div class="stat-icon">
+                                <i class="bi bi-arrow-right-circle"></i>
+                            </div>
+                            <div class="stat-number" th:text="${prestamosActivos}">0</div>
+                            <div class="stat-label">Préstamos Activos</div>
+                            <div class="stat-trend">
+                                <i class="bi bi-arrow-up"></i> +5%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+                        <div class="stat-card-modern variant-4">
+                            <div class="stat-icon">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-number" th:text="${prestamosVencidos}">0</div>
+                            <div class="stat-label">Préstamos Vencidos</div>
+                            <div class="stat-trend text-warning">
+                                <i class="bi bi-exclamation-circle"></i> Requiere atención
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Row rediseñado -->
+                <div class="row mb-4">
+                    <div class="col-md-8" data-aos="fade-right">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-bar-chart-line"></i>
+                                <span>Préstamos por Mes</span>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="prestamosChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4" data-aos="fade-left">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-pie-chart"></i>
+                                <span>Distribución por Estado</span>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="estadosChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Top Libros con diseño mejorado -->
+                <div class="row" data-aos="fade-up">
+                    <div class="col-md-12">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-trophy-fill" style="color: #ffb347;"></i>
+                                <span>Top 5 Libros Más Prestados</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Libro</th>
+                                                <th>Código</th>
+                                                <th>Categoría</th>
+                                                <th>Total Préstamos</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="libro, iterStat : ${topLibros}" style="animation: fadeInUp 0.5s ease" th:styleappend="'animation-delay: ' + (${iterStat.index} * 0.1) + 's;'">
+                                                <td>
+                                                    <span class="badge-modern info" th:text="${iterStat.count}">1</span>
+                                                </td>
+                                                <td class="fw-semibold" th:text="${libro.libroNombre}">Cien años de soledad</td>
+                                                <td><code th:text="${libro.libroCodigo}">LIB-001</code></td>
+                                                <td>
+                                                    <span class="badge-modern info" th:text="${libro.categoria}">Novela</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern success" th:text="${libro.totalPrestamos}">15</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Últimos Préstamos rediseñado -->
+                <div class="row mt-4" data-aos="fade-up">
+                    <div class="col-md-12">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-clock-history"></i>
+                                <span>Últimos Préstamos</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern datatable">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Alumno</th>
+                                                <th>Libro</th>
+                                                <th>Fecha Préstamo</th>
+                                                <th>Fecha Devolución</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="prestamo : ${ultimosPrestamos}">
+                                                <td><span class="fw-semibold" th:text="${prestamo.id}">1</span></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="user-avatar small me-2" style="width: 32px; height: 32px; background: #1e4a7a20; color: #1e4a7a;">
+                                                            <i class="bi bi-person"></i>
+                                                        </div>
+                                                        <span th:text="${prestamo.usuarioNombre}">Juan Pérez</span>
+                                                    </div>
+                                                </td>
+                                                <td th:text="${prestamo.libroNombre}">El principito</td>
+                                                <td th:text="${prestamo.fechaPrestamoFormatted}">15/02/2026</td>
+                                                <td th:text="${prestamo.fechaDevolucionEstimadaFormatted}">22/02/2026</td>
+                                                <td>
+                                                    <span class="badge-modern" 
+                                                          th:classappend="${prestamo.estado == 'ACTIVO' ? 'success' : 
+                                                                           (prestamo.estado == 'VENCIDO' ? 'danger' : 'info')}"
+                                                          th:text="${prestamo.estado}">ACTIVO</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Acciones rápidas -->
+                <div class="row mt-4" data-aos="fade-up">
+                    <div class="col-12">
+                        <div class="card-modern bg-transparent shadow-none">
+                            <div class="card-body d-flex gap-3 flex-wrap">
+                                <a href="/admin/libros/nuevo" class="btn-modern primary">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Nuevo Libro
+                                </a>
+                                <a href="/admin/usuarios/nuevo" class="btn-modern primary">
+                                    <i class="bi bi-person-plus me-2"></i>
+                                    Nuevo Usuario
+                                </a>
+                                <a href="/admin/prestamos/nuevo" class="btn-modern primary">
+                                    <i class="bi bi-arrow-left-right me-2"></i>
+                                    Nuevo Préstamo
+                                </a>
+                                <a href="/admin/reportes/generar" class="btn-modern outline">
+                                    <i class="bi bi-file-pdf me-2"></i>
+                                    Generar Reporte
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Incluir footer rediseñado -->
+    <div th:replace="~{layout/header :: footer}"></div>
+    
+    <script>
+        // Fecha actual formateada
+        document.addEventListener('DOMContentLoaded', function() {
+            const fecha = new Date();
+            const opciones = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('fecha-actual').textContent = 
+                fecha.toLocaleDateString('es-ES', opciones).replace(/^\w/, c => c.toUpperCase());
+            
+            // Inicializar gráficos
+            initCharts();
+        });
+        
+        function initCharts() {
+            // Gráfico de préstamos por mes
+            var ctx1 = document.getElementById('prestamosChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Préstamos',
+                        data: [12, 19, 15, 17, 24, 23],
+                        borderColor: '#1e4a7a',
+                        backgroundColor: 'rgba(30, 74, 122, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#1e4a7a',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e4a7a',
+                            titleColor: 'white',
+                            bodyColor: 'rgba(255,255,255,0.9)',
+                            borderColor: 'rgba(255,255,255,0.2)',
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de distribución por estado
+            var ctx2 = document.getElementById('estadosChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Activos', 'Devueltos', 'Vencidos'],
+                    datasets: [{
+                        data: [
+                            [[${prestamosActivos}]], 
+                            0, 
+                            [[${prestamosVencidos}]]
+                        ],
+                        backgroundColor: [
+                            '#1e4a7a',
+                            '#00c9b7',
+                            '#ff4757'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 12,
+                                    family: 'Inter'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e4a7a',
+                            titleColor: 'white',
+                            bodyColor: 'rgba(255,255,255,0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw} préstamos`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+    </script>
+</body>
+</html>

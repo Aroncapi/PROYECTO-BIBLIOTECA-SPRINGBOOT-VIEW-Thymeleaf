@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: head('Gestión de Libros - Biblioteca Escolar')}">
+</head>
+<body>
+    <!-- Incluir el navbar rediseñado -->
+    <div th:replace="~{layout/header :: navbar}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar rediseñado -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar-modern">
+                    <div class="sidebar-header">
+                        <h5>
+                            <i class="bi bi-person-badge"></i>
+                            Panel Admin
+                        </h5>
+                    </div>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a class="nav-link" href="/admin/usuarios">
+                            <i class="bi bi-people"></i>
+                            <span>Usuarios</span>
+                        </a>
+                        <a class="nav-link active" href="/admin/libros">
+                            <i class="bi bi-book"></i>
+                            <span>Libros</span>
+                        </a>
+                        <a class="nav-link" href="/admin/prestamos">
+                            <i class="bi bi-arrow-left-right"></i>
+                            <span>Préstamos</span>
+                        </a>
+                        <a class="nav-link" href="/admin/reportes">
+                            <i class="bi bi-file-text"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content rediseñado -->
+            <div class="col-md-9 col-lg-10 main-content-modern">
+                <div class="content-header" data-aos="fade-right">
+                    <h2>
+                        <i class="bi bi-book me-2" style="color: #1e4a7a;"></i>
+                        Gestión de Libros
+                    </h2>
+                    <div class="d-flex gap-3">
+                        <div class="date-badge">
+                            <i class="bi bi-bookmark-check"></i>
+                            <span id="totalLibros" th:text="'Total: ' + ${#lists.size(libros)}"></span>
+                        </div>
+                        <button class="btn-modern primary" data-bs-toggle="modal" data-bs-target="#modalLibro">
+                            <i class="bi bi-plus-circle"></i>
+                            Nuevo Libro
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Barra de búsqueda mejorada -->
+                <div class="row mb-4" data-aos="fade-up">
+                    <div class="col-md-8">
+                        <div class="input-group" style="box-shadow: var(--shadow-sm); border-radius: 50px; overflow: hidden;">
+                            <span class="input-group-text bg-white border-0 ps-4">
+                                <i class="bi bi-search" style="color: #1e4a7a;"></i>
+                            </span>
+                            <input type="text" class="form-control border-0 py-3" id="buscarLibro" 
+                                   placeholder="Buscar por nombre, código o categoría..."
+                                   style="background: white;">
+                            <button class="btn btn-modern primary rounded-0" type="button" id="btnBuscar">
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <span class="badge-modern info px-4 py-3" id="totalLibrosBadge" th:text="'📚 Total: ' + ${#lists.size(libros)}">
+                                📚 Total: 0
+                            </span>
+                            <span class="badge-modern success px-4 py-3" id="totalDisponiblesBadge">
+                                ✅ Disponibles: 0
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabla de libros rediseñada -->
+                <div class="card-modern" data-aos="fade-up">
+                    <div class="card-header">
+                        <i class="bi bi-table"></i>
+                        <span>Listado de Libros</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table-modern datatable" id="tablaLibros">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Código</th>
+                                        <th>Nombre</th>
+                                        <th>Categoría</th>
+                                        <th>Stock Total</th>
+                                        <th>Stock Disponible</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="libro, iterStat : ${libros}" 
+                                        style="animation: fadeInUp 0.5s ease" 
+                                        th:styleappend="'animation-delay: ' + (${iterStat.index} * 0.05) + 's;'">
+                                        <td>
+                                            <span class="fw-semibold" th:text="${libro.id}">1</span>
+                                        </td>
+                                        <td>
+                                            <code class="bg-light p-2 rounded-3" style="color: #1e4a7a;" th:text="${libro.codigoLibro}">LIB-001</code>
+                                        </td>
+                                        <td class="fw-semibold" th:text="${libro.nombre}">Cien años de soledad</td>
+                                        <td>
+                                            <span class="badge-modern info" th:text="${libro.categoria}">Novela</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge-modern" style="background: #e6f0fa; color: #1e4a7a;" th:text="${libro.stockTotal}">5</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge-modern success" th:text="${libro.stockDisponible}">3</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge-modern" 
+                                                  th:classappend="${libro.stockDisponible > 0 ? 'success' : 'danger'}"
+                                                  th:text="${libro.stockDisponible > 0 ? 'Disponible' : 'Agotado'}">
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-sm" style="background: #ffb34720; color: #ffb347; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                        th:onclick="'editarLibro(' + ${libro.id} + ')'"
+                                                        data-bs-toggle="tooltip" title="Editar libro">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm" style="background: #ff475720; color: #ff4757; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                        th:onclick="'eliminarLibro(' + ${libro.id} + ')'"
+                                                        th:if="${libro.stockDisponible == libro.stockTotal}"
+                                                        data-bs-toggle="tooltip" title="Eliminar libro">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                                <button class="btn btn-sm" style="background: #1e4a7a20; color: #1e4a7a; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                        th:onclick="'verDetalle(' + ${libro.id} + ')'"
+                                                        data-bs-toggle="tooltip" title="Ver detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Acciones rápidas adicionales -->
+                <div class="row mt-4" data-aos="fade-up">
+                    <div class="col-12">
+                        <div class="card-modern bg-transparent shadow-none">
+                            <div class="card-body d-flex gap-3 flex-wrap justify-content-end">
+                                <button class="btn-modern outline" onclick="exportarExcel()">
+                                    <i class="bi bi-file-excel me-2" style="color: #00c9b7;"></i>
+                                    Exportar a Excel
+                                </button>
+                                <button class="btn-modern outline" onclick="exportarPDF()">
+                                    <i class="bi bi-file-pdf me-2" style="color: #ff4757;"></i>
+                                    Exportar a PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para crear/editar libro rediseñado -->
+    <div class="modal fade" id="modalLibro" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-book-half me-2"></i>
+                        <span id="modalTitle">Nuevo Libro</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formLibro" class="needs-validation" novalidate>
+                        <input type="hidden" id="libroId" name="id">
+                        
+                        <div class="mb-4">
+                            <label for="nombre" class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-book me-2"></i>Nombre del Libro
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-book" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-light py-3" 
+                                       id="nombre" name="nombre" required 
+                                       placeholder="Ej: Cien años de soledad">
+                            </div>
+                            <div class="invalid-feedback">
+                                Por favor ingrese el nombre del libro.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="categoria" class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-tags me-2"></i>Categoría
+                            </label>
+                            <select class="form-select bg-light border-0 py-3 rounded-4" id="categoria" name="categoria" required>
+                                <option value="">Seleccione una categoría</option>
+                                <option value="Novela">📖 Novela</option>
+                                <option value="Infantil">🧸 Infantil</option>
+                                <option value="Fantasía">🧙 Fantasía</option>
+                                <option value="Ciencia ficción">🚀 Ciencia ficción</option>
+                                <option value="Clásico">🏛️ Clásico</option>
+                                <option value="Terror">👻 Terror</option>
+                                <option value="Biografía">📝 Biografía</option>
+                                <option value="Historia">📜 Historia</option>
+                                <option value="Poesía">📝 Poesía</option>
+                                <option value="Teatro">🎭 Teatro</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor seleccione una categoría.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="codigoLibro" class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-upc-scan me-2"></i>Código del Libro
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-upc-scan" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-light py-3" 
+                                       id="codigoLibro" name="codigoLibro" 
+                                       pattern="[A-Z0-9-]+" required 
+                                       placeholder="LIB-001">
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Solo mayúsculas, números y guiones
+                            </small>
+                            <div class="invalid-feedback">
+                                El código debe tener solo mayúsculas, números y guiones.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="stockTotal" class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-box me-2"></i>Stock Total
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-box" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="number" class="form-control border-0 bg-light py-3" 
+                                       id="stockTotal" name="stockTotal" 
+                                       min="0" required placeholder="5">
+                            </div>
+                            <div class="invalid-feedback">
+                                Por favor ingrese el stock total.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3" id="stockDisponibleGroup" style="display: none;">
+                            <label for="stockDisponible" class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-check-circle me-2"></i>Stock Disponible
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-check-circle" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="number" class="form-control border-0 bg-light py-3" 
+                                       id="stockDisponible" name="stockDisponible" 
+                                       min="0" readonly>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern outline" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-modern primary" id="btnGuardarLibro">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Guardar Libro
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para ver detalle rediseñado -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Detalle del Libro
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" id="detalleContent">
+                    <!-- Se llena con JavaScript -->
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern primary" data-bs-dismiss="modal">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Incluir footer rediseñado -->
+    <div th:replace="~{layout/header :: footer}"></div>
+    
+    <script>
+        // Variable global para almacenar libros
+        let libros = /*[[${libros}]]*/ [];
+        
+        // Calcular total de libros disponibles
+        function actualizarEstadisticas() {
+            let totalDisponibles = libros.reduce((sum, libro) => sum + libro.stockDisponible, 0);
+            let totalDisponiblesBadge = document.getElementById('totalDisponiblesBadge');
+            if (totalDisponiblesBadge) {
+                totalDisponiblesBadge.textContent = '✅ Disponibles: ' + totalDisponibles;
+            }
+        }
+        
+        // Llamar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarEstadisticas();
+        });
+        
+        // Función para guardar libro mejorada
+        document.getElementById('btnGuardarLibro')?.addEventListener('click', function() {
+            let form = document.getElementById('formLibro');
+            
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                
+                // Animación de shake en campos inválidos
+                form.querySelectorAll(':invalid').forEach(field => {
+                    field.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => {
+                        field.style.animation = '';
+                    }, 500);
+                });
+                return;
+            }
+            
+            let formData = {
+                nombre: document.getElementById('nombre').value,
+                categoria: document.getElementById('categoria').value,
+                codigoLibro: document.getElementById('codigoLibro').value,
+                stockTotal: parseInt(document.getElementById('stockTotal').value)
+            };
+            
+            let libroId = document.getElementById('libroId').value;
+            let method = libroId ? 'PUT' : 'POST';
+            let url = libroId ? '/api/libros/' + libroId : '/api/libros';
+            
+            // Mostrar loading
+            Swal.fire({
+                title: 'Guardando...',
+                html: 'Por favor espere',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.close();
+                showNotification(libroId ? '✅ Libro actualizado correctamente' : '✅ Libro creado correctamente');
+                setTimeout(() => location.reload(), 1500);
+            })
+            .catch(error => {
+                Swal.close();
+                showNotification('❌ Error: ' + error.message, 'error');
+            });
+        });
+        
+        // Función para editar libro mejorada
+        window.editarLibro = function(id) {
+            // Mostrar loading
+            Swal.fire({
+                title: 'Cargando...',
+                html: 'Obteniendo información del libro',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch('/api/libros/' + id)
+                .then(response => response.json())
+                .then(libro => {
+                    Swal.close();
+                    
+                    document.getElementById('modalTitle').textContent = 'Editar Libro';
+                    document.getElementById('libroId').value = libro.id;
+                    document.getElementById('nombre').value = libro.nombre;
+                    document.getElementById('categoria').value = libro.categoria;
+                    document.getElementById('codigoLibro').value = libro.codigoLibro;
+                    document.getElementById('stockTotal').value = libro.stockTotal;
+                    document.getElementById('stockDisponibleGroup').style.display = 'block';
+                    document.getElementById('stockDisponible').value = libro.stockDisponible;
+                    
+                    let modal = new bootstrap.Modal(document.getElementById('modalLibro'));
+                    modal.show();
+                })
+                .catch(error => {
+                    Swal.close();
+                    showNotification('Error al cargar el libro: ' + error.message, 'error');
+                });
+        };
+        
+        // Función para eliminar libro mejorada
+        window.eliminarLibro = function(id) {
+            confirmAction('¿Estás seguro de eliminar este libro? Esta acción no se puede deshacer.', function() {
+                fetch('/api/libros/' + id, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showNotification('✅ Libro eliminado correctamente');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                })
+                .catch(error => {
+                    showNotification('❌ Error: ' + error.message, 'error');
+                });
+            });
+        };
+        
+        // Función para ver detalle mejorada
+        window.verDetalle = function(id) {
+            fetch('/api/libros/' + id)
+                .then(response => response.json())
+                .then(libro => {
+                    let estadoClass = libro.stockDisponible > 0 ? 'success' : 'danger';
+                    let estadoTexto = libro.stockDisponible > 0 ? 'DISPONIBLE' : 'AGOTADO';
+                    
+                    let html = `
+                        <div class="text-center mb-4">
+                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-book" style="font-size: 2.5rem; color: #1e4a7a;"></i>
+                            </div>
+                        </div>
+                        <div class="bg-light p-4 rounded-4">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a; width: 40%;">ID:</td>
+                                    <td><span class="badge-modern info">${libro.id}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Código:</td>
+                                    <td><code class="bg-white p-2 rounded-3" style="color: #1e4a7a;">${libro.codigoLibro}</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Nombre:</td>
+                                    <td class="fw-bold">${libro.nombre}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Categoría:</td>
+                                    <td><span class="badge-modern info">${libro.categoria}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Stock Total:</td>
+                                    <td><span class="badge-modern" style="background: #e6f0fa; color: #1e4a7a;">${libro.stockTotal}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Stock Disponible:</td>
+                                    <td><span class="badge-modern ${estadoClass}">${libro.stockDisponible}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Estado:</td>
+                                    <td><span class="badge-modern ${estadoClass}">${estadoTexto}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    `;
+                    
+                    document.getElementById('detalleContent').innerHTML = html;
+                    let modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+                    modal.show();
+                });
+        };
+        
+        // Búsqueda en tiempo real mejorada
+        document.getElementById('buscarLibro')?.addEventListener('keyup', function() {
+            let value = this.value.toLowerCase();
+            let rows = document.querySelectorAll('#tablaLibros tbody tr');
+            let contador = 0;
+            
+            rows.forEach(row => {
+                let text = row.textContent.toLowerCase();
+                let matches = text.includes(value);
+                row.style.display = matches ? '' : 'none';
+                if (matches) contador++;
+            });
+            
+            // Mostrar resultado de búsqueda
+            let totalLibrosBadge = document.getElementById('totalLibrosBadge');
+            if (totalLibrosBadge) {
+                if (value.length > 0) {
+                    totalLibrosBadge.textContent = `🔍 Mostrando: ${contador} de ${libros.length}`;
+                } else {
+                    totalLibrosBadge.textContent = `📚 Total: ${libros.length}`;
+                }
+            }
+        });
+        
+        // Limpiar modal al cerrar
+        document.getElementById('modalLibro')?.addEventListener('hidden.bs.modal', function() {
+            document.getElementById('formLibro').reset();
+            document.getElementById('formLibro').classList.remove('was-validated');
+            document.getElementById('libroId').value = '';
+            document.getElementById('modalTitle').textContent = 'Nuevo Libro';
+            document.getElementById('stockDisponibleGroup').style.display = 'none';
+        });
+        
+        // Funciones de exportación (placeholder)
+        window.exportarExcel = function() {
+            showNotification('Funcionalidad de exportación a Excel próximamente', 'info');
+        };
+        
+        window.exportarPDF = function() {
+            showNotification('Funcionalidad de exportación a PDF próximamente', 'info');
+        };
+    </script>
+</body>
+</html>

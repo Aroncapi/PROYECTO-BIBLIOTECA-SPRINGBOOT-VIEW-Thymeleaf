@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/header :: head('Mi Perfil - Biblioteca Escolar')}">
+</head>
+<body>
+    <!-- Incluir navbar rediseñado -->
+    <div th:replace="~{layout/header :: navbar}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar rediseñado -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar-modern">
+                    <div class="sidebar-header">
+                        <h5>
+                            <i class="bi bi-person-badge"></i>
+                            Panel Admin
+                        </h5>
+                    </div>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a class="nav-link" href="/admin/usuarios">
+                            <i class="bi bi-people"></i>
+                            <span>Usuarios</span>
+                        </a>
+                        <a class="nav-link" href="/admin/libros">
+                            <i class="bi bi-book"></i>
+                            <span>Libros</span>
+                        </a>
+                        <a class="nav-link" href="/admin/prestamos">
+                            <i class="bi bi-arrow-left-right"></i>
+                            <span>Préstamos</span>
+                        </a>
+                        <a class="nav-link" href="/admin/reportes">
+                            <i class="bi bi-file-text"></i>
+                            <span>Reportes</span>
+                        </a>
+                        <a class="nav-link active" href="/admin/perfil">
+                            <i class="bi bi-person"></i>
+                            <span>Mi Perfil</span>
+                        </a>
+                    </nav>
+                    
+                    <!-- Info adicional en sidebar -->
+                    <div class="sidebar-header mt-4">
+                        <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.1);">
+                            <small class="text-white-50 d-block mb-2">Estado de cuenta</small>
+                            <div class="d-flex align-items-center text-white">
+                                <i class="bi bi-shield-check me-2" style="color: #00c9b7;"></i>
+                                <span>Activo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content rediseñado -->
+            <div class="col-md-9 col-lg-10 main-content-modern">
+                <div class="content-header" data-aos="fade-right">
+                    <h2>
+                        <i class="bi bi-person-circle me-2" style="color: #1e4a7a;"></i>
+                        Mi Perfil
+                    </h2>
+                    <div class="date-badge">
+                        <i class="bi bi-clock"></i>
+                        <span th:text="${#dates.format(#dates.createNow(), 'HH:mm')}">23:35</span>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Tarjeta de perfil rediseñada -->
+                    <div class="col-md-4" data-aos="fade-right">
+                        <div class="card-modern text-center">
+                            <div class="card-body p-4">
+                                <!-- Avatar con degradado -->
+                                <div class="mb-4">
+                                    <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #1e4a7a, #00c9b7); border-radius: 30px; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+                                        <i class="bi bi-person-badge text-white" style="font-size: 4rem;"></i>
+                                    </div>
+                                </div>
+                                
+                                <h3 class="fw-bold mb-2" th:text="${usuario.nombre + ' ' + usuario.apellido}">Admin Principal</h3>
+                                <p class="text-muted mb-3" th:text="${usuario.email}">admin@biblioteca.com</p>
+                                
+                                <span class="badge-modern danger mb-4 px-4 py-2" style="font-size: 0.9rem;">
+                                    <i class="bi bi-shield-fill me-2"></i>
+                                    ADMINISTRADOR
+                                </span>
+                                
+                                <button class="btn-modern primary w-100 py-3" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
+                                    <i class="bi bi-pencil me-2"></i>
+                                    Editar Perfil
+                                </button>
+                                
+                                <!-- Estadísticas rápidas del perfil -->
+                                <div class="row mt-4 pt-3 border-top">
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <div class="fw-bold fs-4" style="color: #1e4a7a;">0</div>
+                                            <small class="text-muted">Préstamos</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <div class="fw-bold fs-4" style="color: #1e4a7a;">∞</div>
+                                            <small class="text-muted">Acceso Total</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Información adicional rediseñada -->
+                    <div class="col-md-8" data-aos="fade-left">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-shield-lock me-2"></i>
+                                <span>Información de la Cuenta</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="bg-light p-4 rounded-4">
+                                    <table class="table table-borderless mb-0">
+                                        <tr>
+                                            <td class="fw-semibold" style="color: #1e4a7a; width: 35%;">
+                                                <i class="bi bi-hash me-2"></i>ID de Usuario:
+                                            </td>
+                                            <td><span class="badge-modern info" th:text="${usuario.id}">1</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold" style="color: #1e4a7a;">
+                                                <i class="bi bi-shield me-2"></i>Rol:
+                                            </td>
+                                            <td><span class="badge-modern danger">ADMINISTRADOR</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold" style="color: #1e4a7a;">
+                                                <i class="bi bi-envelope me-2"></i>Email:
+                                            </td>
+                                            <td><i class="bi bi-envelope me-2" style="color: #1e4a7a;"></i><span th:text="${usuario.email}">admin@biblioteca.com</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold" style="color: #1e4a7a;">
+                                                <i class="bi bi-calendar-plus me-2"></i>Fecha de Registro:
+                                            </td>
+                                            <td>15 de enero, 2026</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold" style="color: #1e4a7a;">
+                                                <i class="bi bi-clock-history me-2"></i>Último Acceso:
+                                            </td>
+                                            <td>
+                                                <span class="badge-modern success" th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}">
+                                                    18/02/2026 23:35
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold" style="color: #1e4a7a;">
+                                                <i class="bi bi-shield-check me-2"></i>Estado:
+                                            </td>
+                                            <td><span class="badge-modern success">Activo</span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <div class="alert alert-modern mt-4" style="background: linear-gradient(135deg, #1e4a7a10, #00c9b710); border-left: 4px solid #1e4a7a; border-radius: 15px;">
+                                    <div class="d-flex">
+                                        <div class="me-3">
+                                            <i class="bi bi-exclamation-triangle-fill" style="color: #1e4a7a; font-size: 1.5rem;"></i>
+                                        </div>
+                                        <div>
+                                            <strong style="color: #1e4a7a;">Acceso de Administrador</strong>
+                                            <p class="mb-0 text-muted">Como administrador, tienes acceso completo a todas las funciones del sistema: gestión de usuarios, libros, préstamos y reportes.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Acciones rápidas rediseñadas -->
+                        <div class="card-modern mt-4" data-aos="fade-up">
+                            <div class="card-header">
+                                <i class="bi bi-lightning-charge me-2" style="color: #ffb347;"></i>
+                                <span>Acciones Rápidas</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <a href="/admin/usuarios" class="btn-modern outline w-100 py-3 d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-people me-2"></i>
+                                            Gestionar Usuarios
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="/admin/libros" class="btn-modern outline w-100 py-3 d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-book me-2"></i>
+                                            Gestionar Libros
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="/admin/prestamos" class="btn-modern outline w-100 py-3 d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-arrow-left-right me-2"></i>
+                                            Ver Préstamos
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="/admin/reportes" class="btn-modern outline w-100 py-3 d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-file-text me-2"></i>
+                                            Generar Reportes
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Actividad reciente (opcional) -->
+                        <div class="card-modern mt-4" data-aos="fade-up">
+                            <div class="card-header">
+                                <i class="bi bi-clock-history me-2"></i>
+                                <span>Actividad Reciente</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush bg-transparent">
+                                    <div class="list-group-item bg-transparent d-flex align-items-center px-0">
+                                        <div class="me-3">
+                                            <div style="width: 40px; height: 40px; background: #00c9b720; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-box-arrow-in-right" style="color: #00c9b7;"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0 fw-semibold">Inicio de sesión</p>
+                                            <small class="text-muted">Hace 5 minutos</small>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item bg-transparent d-flex align-items-center px-0">
+                                        <div class="me-3">
+                                            <div style="width: 40px; height: 40px; background: #ffb34720; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-plus-circle" style="color: #ffb347;"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0 fw-semibold">Nuevo libro agregado</p>
+                                            <small class="text-muted">Hace 2 horas</small>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item bg-transparent d-flex align-items-center px-0">
+                                        <div class="me-3">
+                                            <div style="width: 40px; height: 40px; background: #1e4a7a20; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-person-plus" style="color: #1e4a7a;"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0 fw-semibold">Nuevo usuario registrado</p>
+                                            <small class="text-muted">Hace 3 horas</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Editar Perfil rediseñado -->
+    <div class="modal fade" id="modalEditarPerfil" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #0b2b4f 0%, #1e4a7a 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Editar Perfil
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formEditarPerfil" class="needs-validation" novalidate>
+                        <div class="text-center mb-4">
+                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-person-circle" style="font-size: 2.5rem; color: #1e4a7a;"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-person me-2"></i>Nombre
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-person" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-light py-3" 
+                                       id="editNombre" th:value="${usuario.nombre}" required 
+                                       placeholder="Tu nombre">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-person me-2"></i>Apellido
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-person" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-light py-3" 
+                                       id="editApellido" th:value="${usuario.apellido}" required 
+                                       placeholder="Tu apellido">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-envelope me-2"></i>Email
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-envelope" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="email" class="form-control border-0 bg-light py-3" 
+                                       id="editEmail" th:value="${usuario.email}" required 
+                                       placeholder="correo@ejemplo.com">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                <i class="bi bi-lock me-2"></i>Nueva Contraseña
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-4 px-3">
+                                    <i class="bi bi-lock" style="color: #1e4a7a;"></i>
+                                </span>
+                                <input type="password" class="form-control border-0 bg-light py-3" 
+                                       id="editPassword" placeholder="Dejar en blanco para no cambiar">
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Si no deseas cambiar tu contraseña, deja este campo vacío
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern outline" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-modern primary" onclick="guardarPerfil()">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para cambiar avatar (opcional) -->
+    <div class="modal fade" id="modalCambiarAvatar" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-image me-2"></i>
+                        Cambiar Avatar
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <div class="mb-4">
+                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 25px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-camera" style="font-size: 2.5rem; color: #1e4a7a;"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">Selecciona una imagen para tu perfil</p>
+                    <div class="d-flex justify-content-center gap-3 mb-4">
+                        <div class="avatar-option" style="width: 60px; height: 60px; background: #1e4a7a; border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                            <i class="bi bi-person text-white fs-2"></i>
+                        </div>
+                        <div class="avatar-option" style="width: 60px; height: 60px; background: #00c9b7; border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                            <i class="bi bi-person-badge text-white fs-2"></i>
+                        </div>
+                        <div class="avatar-option" style="width: 60px; height: 60px; background: #ffb347; border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                            <i class="bi bi-person-circle text-white fs-2"></i>
+                        </div>
+                    </div>
+                    <button class="btn-modern outline w-100">Subir imagen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Incluir footer rediseñado -->
+    <div th:replace="~{layout/header :: footer}"></div>
+    
+    <script>
+        function guardarPerfil() {
+            let form = document.getElementById('formEditarPerfil');
+            
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                
+                // Animación de shake en campos inválidos
+                form.querySelectorAll(':invalid').forEach(field => {
+                    field.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => {
+                        field.style.animation = '';
+                    }, 500);
+                });
+                return;
+            }
+            
+            let data = {
+                nombre: document.getElementById('editNombre').value,
+                apellido: document.getElementById('editApellido').value,
+                email: document.getElementById('editEmail').value,
+                password: document.getElementById('editPassword').value
+            };
+            
+            // Mostrar loading
+            Swal.fire({
+                title: 'Actualizando perfil...',
+                html: 'Por favor espere',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch('/api/usuarios/perfil', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    Swal.close();
+                    showNotification('✅ Perfil actualizado correctamente');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                Swal.close();
+                showNotification('❌ Error: ' + error.message, 'error');
+            });
+            
+            bootstrap.Modal.getInstance(document.getElementById('modalEditarPerfil')).hide();
+        }
+        
+        // Validación del formulario
+        (function() {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: head('Mis Préstamos - Biblioteca Escolar')}">
+</head>
+<body>
+    <!-- Incluir el navbar rediseñado -->
+    <div th:replace="~{layout/header :: navbar}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Alumno rediseñado -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar-modern">
+                    <div class="sidebar-header">
+                        <h5>
+                            <i class="bi bi-person"></i>
+                            Panel Alumno
+                        </h5>
+                    </div>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="/alumno/catalogo">
+                            <i class="bi bi-book"></i>
+                            <span>Catálogo</span>
+                        </a>
+                        <a class="nav-link active" href="/alumno/mis-prestamos">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Mis Préstamos</span>
+                        </a>
+                        <a class="nav-link" href="/alumno/perfil">
+                            <i class="bi bi-person"></i>
+                            <span>Mi Perfil</span>
+                        </a>
+                    </nav>
+                    
+                    <!-- Info adicional en sidebar -->
+                    <div class="sidebar-header mt-4">
+                        <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.1);">
+                            <small class="text-white-50 d-block mb-2">Límite de préstamos</small>
+                            <div class="d-flex align-items-center text-white">
+                                <i class="bi bi-bookmark-check me-2" style="color: #00c9b7;"></i>
+                                <span>Máximo 3 libros</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content rediseñado -->
+            <div class="col-md-9 col-lg-10 main-content-modern">
+                <div class="content-header" data-aos="fade-right">
+                    <h2>
+                        <i class="bi bi-clock-history me-2" style="color: #1e4a7a;"></i>
+                        Mis Préstamos
+                    </h2>
+                    <div class="date-badge">
+                        <i class="bi bi-calendar-check"></i>
+                        <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}">21/02/2026</span>
+                    </div>
+                </div>
+                
+                <!-- Resumen de préstamos rediseñado -->
+                <div class="row mb-4" data-aos="fade-up">
+                    <div class="col-md-4">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #1e4a7a 0%, #2c6b9e 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${activos.size()}">0</div>
+                                    <div class="stat-label">Préstamos Activos</div>
+                                </div>
+                                <i class="bi bi-book" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${devueltos.size()}">0</div>
+                                    <div class="stat-label">Devueltos</div>
+                                </div>
+                                <i class="bi bi-check-circle" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #ff4757 0%, #ff6b6b 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${vencidos.size()}">0</div>
+                                    <div class="stat-label">Vencidos</div>
+                                </div>
+                                <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pestañas de préstamos rediseñadas -->
+                <ul class="nav nav-tabs border-0 mb-4" id="prestamoTabs" role="tablist" data-aos="fade-up">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link-modern active" id="todos-tab" data-bs-toggle="tab" 
+                                data-bs-target="#todos" type="button" role="tab">
+                            <i class="bi bi-grid"></i>
+                            <span>Todos</span>
+                            <span class="badge-modern info ms-2" th:text="${todos.size()}">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link-modern" id="activos-tab" data-bs-toggle="tab" 
+                                data-bs-target="#activos" type="button" role="tab">
+                            <i class="bi bi-play-circle" style="color: #00c9b7;"></i>
+                            <span>Activos</span>
+                            <span class="badge-modern success ms-2" th:text="${activos.size()}">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link-modern" id="devueltos-tab" data-bs-toggle="tab" 
+                                data-bs-target="#devueltos" type="button" role="tab">
+                            <i class="bi bi-check-circle" style="color: #1e4a7a;"></i>
+                            <span>Devueltos</span>
+                            <span class="badge-modern info ms-2" th:text="${devueltos.size()}">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link-modern" id="vencidos-tab" data-bs-toggle="tab" 
+                                data-bs-target="#vencidos" type="button" role="tab">
+                            <i class="bi bi-exclamation-triangle" style="color: #ff4757;"></i>
+                            <span>Vencidos</span>
+                            <span class="badge-modern danger ms-2" th:text="${vencidos.size()}">0</span>
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- Contenido de pestañas rediseñado -->
+                <div class="tab-content" id="prestamoTabsContent">
+                    <!-- Todos los préstamos -->
+                    <div class="tab-pane fade show active" id="todos" role="tabpanel" data-aos="fade-up">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-grid me-2"></i>
+                                <span>Todos mis préstamos</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern datatable">
+                                        <thead>
+                                            <tr>
+                                                <th>Libro</th>
+                                                <th>Fecha Préstamo</th>
+                                                <th>Fecha Devolución</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="prestamo, iterStat : ${todos}"
+                                                style="animation: fadeInUp 0.5s ease" 
+                                                th:styleappend="'animation-delay: ' + (${iterStat.index} * 0.05) + 's;'">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="me-3">
+                                                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="bi bi-book" style="color: #1e4a7a;"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <strong th:text="${prestamo.libroNombre}">El principito</strong>
+                                                            <br>
+                                                            <small class="text-muted" th:text="${prestamo.libroCodigo}">LIB-001</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern" style="background: #e6f0fa; color: #1e4a7a;" 
+                                                          th:text="${prestamo.fechaPrestamoFormatted}">15/02/2026</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern" style="background: #e6f0fa; color: #1e4a7a;" 
+                                                          th:text="${prestamo.fechaDevolucionEstimadaFormatted}">22/02/2026</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge-modern" 
+                                                          th:classappend="${prestamo.estado == 'ACTIVO' ? 'success' : 
+                                                                           (prestamo.estado == 'VENCIDO' ? 'danger' : 'info')}"
+                                                          th:text="${prestamo.estado}">ACTIVO</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm" style="background: #00c9b720; color: #00c9b7; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                                th:if="${prestamo.estado == 'ACTIVO'}"
+                                                                th:onclick="'devolverLibro(' + ${prestamo.id} + ')'"
+                                                                data-bs-toggle="tooltip" title="Devolver libro">
+                                                            <i class="bi bi-arrow-return-left"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background: #1e4a7a20; color: #1e4a7a; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                                th:onclick="'verDetalle(' + ${prestamo.id} + ')'"
+                                                                data-bs-toggle="tooltip" title="Ver detalles">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Préstamos Activos -->
+                    <div class="tab-pane fade" id="activos" role="tabpanel" data-aos="fade-up">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-play-circle me-2" style="color: #00c9b7;"></i>
+                                <span>Préstamos activos</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern">
+                                        <thead>
+                                            <tr>
+                                                <th>Libro</th>
+                                                <th>Fecha Préstamo</th>
+                                                <th>Fecha Devolución</th>
+                                                <th>Días Restantes</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="prestamo : ${activos}">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="me-3">
+                                                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #00c9b720, #1e4a7a20); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="bi bi-book" style="color: #00c9b7;"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <strong th:text="${prestamo.libroNombre}">El principito</strong>
+                                                            <br>
+                                                            <small class="text-muted" th:text="${prestamo.libroCodigo}">LIB-001</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td th:text="${prestamo.fechaPrestamoFormatted}">15/02/2026</td>
+                                                <td th:text="${prestamo.fechaDevolucionEstimadaFormatted}">22/02/2026</td>
+                                                <td>
+                                                    <span class="badge-modern" 
+                                                          th:classappend="${prestamo.diasRestantes > 3 ? 'success' : 
+                                                                           (prestamo.diasRestantes > 0 ? 'warning' : 'danger')}"
+                                                          th:text="${prestamo.diasRestantes} + ' días'">5 días</span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm" style="background: #00c9b720; color: #00c9b7; border: none; padding: 8px 12px; border-radius: 12px;" 
+                                                            th:onclick="'devolverLibro(' + ${prestamo.id} + ')'"
+                                                            data-bs-toggle="tooltip" title="Devolver libro">
+                                                        <i class="bi bi-arrow-return-left"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Préstamos Devueltos -->
+                    <div class="tab-pane fade" id="devueltos" role="tabpanel" data-aos="fade-up">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-check-circle me-2" style="color: #1e4a7a;"></i>
+                                <span>Préstamos devueltos</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern">
+                                        <thead>
+                                            <tr>
+                                                <th>Libro</th>
+                                                <th>Fecha Préstamo</th>
+                                                <th>Fecha Devolución</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="prestamo : ${devueltos}">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="me-3">
+                                                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="bi bi-book" style="color: #1e4a7a;"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <strong th:text="${prestamo.libroNombre}">El principito</strong>
+                                                            <br>
+                                                            <small class="text-muted" th:text="${prestamo.libroCodigo}">LIB-001</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td th:text="${prestamo.fechaPrestamoFormatted}">15/02/2026</td>
+                                                <td th:text="${prestamo.fechaDevolucionRealFormatted}">22/02/2026</td>
+                                                <td>
+                                                    <span class="badge-modern info" th:text="${prestamo.estado}">DEVUELTO</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Préstamos Vencidos -->
+                    <div class="tab-pane fade" id="vencidos" role="tabpanel" data-aos="fade-up">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-exclamation-triangle me-2" style="color: #ff4757;"></i>
+                                <span>Préstamos vencidos</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern">
+                                        <thead>
+                                            <tr>
+                                                <th>Libro</th>
+                                                <th>Fecha Préstamo</th>
+                                                <th>Fecha Devolución</th>
+                                                <th>Días de Retraso</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="prestamo : ${vencidos}">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="me-3">
+                                                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ff475720, #1e4a7a20); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="bi bi-exclamation-triangle" style="color: #ff4757;"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <strong th:text="${prestamo.libroNombre}">El principito</strong>
+                                                            <br>
+                                                            <small class="text-muted" th:text="${prestamo.libroCodigo}">LIB-001</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td th:text="${prestamo.fechaPrestamoFormatted}">15/02/2026</td>
+                                                <td th:text="${prestamo.fechaDevolucionEstimadaFormatted}">22/02/2026</td>
+                                                <td>
+                                                    <span class="badge-modern danger" th:text="${prestamo.diasRetraso} + ' días'">5 días</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Historial de actividad (opcional) -->
+                <div class="row mt-4" data-aos="fade-up">
+                    <div class="col-md-12">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-activity me-2"></i>
+                                <span>Actividad reciente</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush bg-transparent">
+                                    <div class="list-group-item bg-transparent d-flex align-items-center px-0" 
+                                         th:each="prestamo : ${todos}" th:if="${prestamo.estado == 'DEVUELTO'}" th:limit="3">
+                                        <div class="me-3">
+                                            <div style="width: 40px; height: 40px; background: #00c9b720; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-arrow-return-left" style="color: #00c9b7;"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0 fw-semibold" th:text="'Devolviste: ' + ${prestamo.libroNombre}">Devolviste: El principito</p>
+                                            <small class="text-muted" th:text="'Fecha: ' + ${prestamo.fechaDevolucionRealFormatted}">Fecha: 22/02/2026</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Detalle de Préstamo rediseñado -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #1e4a7a 0%, #00c9b7 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Detalle del Préstamo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" id="detalleContent">
+                    <!-- Se llena con JavaScript -->
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern primary" data-bs-dismiss="modal">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Incluir footer rediseñado -->
+    <div th:replace="~{layout/header :: footer}"></div>
+    
+    <script>
+        let prestamoSeleccionado = null;
+        
+        function devolverLibro(prestamoId) {
+            prestamoSeleccionado = prestamoId;
+            confirmAction('¿Confirmas la devolución de este libro?', function() {
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Procesando devolución...',
+                    html: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                fetch('/api/alumno/prestamos/devolver/' + prestamoSeleccionado, {
+                    method: 'PUT'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.close();
+                        showNotification('✅ Libro devuelto correctamente');
+                        setTimeout(() => location.reload(), 2000);
+                    } else {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                })
+                .catch(error => {
+                    Swal.close();
+                    showNotification('❌ Error: ' + error.message, 'error');
+                });
+            });
+        }
+        
+        function verDetalle(prestamoId) {
+            fetch('/api/prestamos/' + prestamoId)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al cargar el detalle');
+                    }
+                    return response.json();
+                })
+                .then(prestamo => {
+                    console.log('Datos del préstamo:', prestamo);
+                    
+                    // Determinar el color de la badge según el estado
+                    let badgeClass = 'info';
+                    let badgeText = prestamo.estado || 'No disponible';
+                    
+                    if (prestamo.estado === 'ACTIVO') badgeClass = 'success';
+                    else if (prestamo.estado === 'VENCIDO') badgeClass = 'danger';
+                    
+                    let html = `
+                        <div class="text-center mb-4">
+                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-journal-bookmark-fill" style="font-size: 2.5rem; color: #1e4a7a;"></i>
+                            </div>
+                        </div>
+                        <div class="bg-light p-4 rounded-4">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a; width: 40%;">Libro:</td>
+                                    <td class="fw-bold">${prestamo.libroNombre || 'No disponible'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Código:</td>
+                                    <td><code class="bg-white p-2 rounded-3" style="color: #1e4a7a;">${prestamo.libroCodigo || 'No disponible'}</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Fecha Préstamo:</td>
+                                    <td>${prestamo.fechaPrestamoFormatted || 'No disponible'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Devolución Estimada:</td>
+                                    <td>${prestamo.fechaDevolucionEstimadaFormatted || 'No disponible'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Devolución Real:</td>
+                                    <td>${prestamo.fechaDevolucionReal ? prestamo.fechaDevolucionRealFormatted : '<span class="badge-modern warning">Pendiente</span>'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold" style="color: #1e4a7a;">Estado:</td>
+                                    <td><span class="badge-modern ${badgeClass}">${badgeText}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    `;
+                    
+                    document.getElementById('detalleContent').innerHTML = html;
+                    
+                    // Mostrar el modal
+                    let modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('❌ Error al cargar el detalle del préstamo', 'error');
+                });
+        }
+        
+        // Inicializar tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

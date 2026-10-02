@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/header :: head('Reportes - Biblioteca Escolar')}">
+</head>
+<body>
+    <!-- Incluir navbar rediseñado -->
+    <div th:replace="~{layout/header :: navbar}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar rediseñado -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar-modern">
+                    <div class="sidebar-header">
+                        <h5>
+                            <i class="bi bi-person-badge"></i>
+                            Panel Admin
+                        </h5>
+                    </div>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a class="nav-link" href="/admin/usuarios">
+                            <i class="bi bi-people"></i>
+                            <span>Usuarios</span>
+                        </a>
+                        <a class="nav-link" href="/admin/libros">
+                            <i class="bi bi-book"></i>
+                            <span>Libros</span>
+                        </a>
+                        <a class="nav-link" href="/admin/prestamos">
+                            <i class="bi bi-arrow-left-right"></i>
+                            <span>Préstamos</span>
+                        </a>
+                        <a class="nav-link active" href="/admin/reportes">
+                            <i class="bi bi-file-text"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content rediseñado -->
+            <div class="col-md-9 col-lg-10 main-content-modern">
+                <div class="content-header" data-aos="fade-right">
+                    <h2>
+                        <i class="bi bi-file-text me-2" style="color: #1e4a7a;"></i>
+                        Reportes y Estadísticas
+                    </h2>
+                    <div class="date-badge">
+                        <i class="bi bi-calendar-check"></i>
+                        <span th:text="${#dates.format(#dates.createNow(), 'MMMM yyyy')}">Febrero 2026</span>
+                    </div>
+                </div>
+                
+                <!-- Filtros de fecha rediseñados -->
+                <div class="row mb-4" data-aos="fade-up">
+                    <div class="col-md-12">
+                        <div class="card-modern">
+                            <div class="card-header">
+                                <i class="bi bi-calendar-range me-2"></i>
+                                <span>Filtros de Fecha</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                            <i class="bi bi-calendar2-week me-2"></i>Fecha Inicio
+                                        </label>
+                                        <div class="input-group" style="box-shadow: var(--shadow-sm); border-radius: 50px; overflow: hidden;">
+                                            <span class="input-group-text bg-white border-0 ps-4">
+                                                <i class="bi bi-calendar" style="color: #1e4a7a;"></i>
+                                            </span>
+                                            <input type="date" class="form-control border-0 py-3" id="fechaInicio" 
+                                                   th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold" style="color: #1e4a7a;">
+                                            <i class="bi bi-calendar2-check me-2"></i>Fecha Fin
+                                        </label>
+                                        <div class="input-group" style="box-shadow: var(--shadow-sm); border-radius: 50px; overflow: hidden;">
+                                            <span class="input-group-text bg-white border-0 ps-4">
+                                                <i class="bi bi-calendar-check" style="color: #1e4a7a;"></i>
+                                            </span>
+                                            <input type="date" class="form-control border-0 py-3" id="fechaFin" 
+                                                   th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn-modern primary w-100 py-3" onclick="aplicarFiltros()">
+                                            <i class="bi bi-funnel me-2"></i>
+                                            Aplicar Filtros
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tarjetas de Reportes rediseñadas -->
+                <div class="row">
+                    <!-- Préstamos Activos -->
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="card-modern h-100" style="cursor: pointer;" onclick="generarReporte('activos')">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-4">
+                                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #00c9b720, #1e4a7a20); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-play-circle" style="font-size: 3rem; color: #00c9b7;"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3" style="color: #1e4a7a;">Préstamos Activos</h5>
+                                <p class="card-text text-muted mb-4">Listado de todos los préstamos actualmente activos</p>
+                                <button class="btn-modern success w-100" onclick="event.stopPropagation(); generarReporte('activos')">
+                                    <i class="bi bi-download me-2"></i>
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Préstamos Vencidos -->
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="card-modern h-100" style="cursor: pointer;" onclick="generarReporte('vencidos')">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-4">
+                                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff475720, #1e4a7a20); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: #ff4757;"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3" style="color: #1e4a7a;">Préstamos Vencidos</h5>
+                                <p class="card-text text-muted mb-4">Listado de préstamos que han excedido la fecha de devolución</p>
+                                <button class="btn-modern danger w-100" onclick="event.stopPropagation(); generarReporte('vencidos')">
+                                    <i class="bi bi-download me-2"></i>
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Top 10 Libros -->
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                        <div class="card-modern h-100" style="cursor: pointer;" onclick="generarReporte('top-libros')">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-4">
+                                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ffb34720, #1e4a7a20); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-trophy" style="font-size: 3rem; color: #ffb347;"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3" style="color: #1e4a7a;">Top 10 Libros</h5>
+                                <p class="card-text text-muted mb-4">Los 10 libros más prestados de la biblioteca</p>
+                                <button class="btn-modern warning w-100" onclick="event.stopPropagation(); generarReporte('top-libros')">
+                                    <i class="bi bi-download me-2"></i>
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Usuarios Más Activos -->
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="400">
+                        <div class="card-modern h-100" style="cursor: pointer;" onclick="generarReporte('usuarios-activos')">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-4">
+                                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-people" style="font-size: 3rem; color: #1e4a7a;"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3" style="color: #1e4a7a;">Usuarios Más Activos</h5>
+                                <p class="card-text text-muted mb-4">Top 10 usuarios con más préstamos</p>
+                                <button class="btn-modern primary w-100" onclick="event.stopPropagation(); generarReporte('usuarios-activos')">
+                                    <i class="bi bi-download me-2"></i>
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estadísticas por Categoría -->
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="500">
+                        <div class="card-modern h-100" style="cursor: pointer;" onclick="generarReporte('categorias')">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-4">
+                                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #00c9b720, #1e4a7a20); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-pie-chart" style="font-size: 3rem; color: #00c9b7;"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3" style="color: #1e4a7a;">Estadísticas por Categoría</h5>
+                                <p class="card-text text-muted mb-4">Distribución de libros y préstamos por categoría</p>
+                                <button class="btn-modern info w-100" onclick="event.stopPropagation(); generarReporte('categorias')">
+                                    <i class="bi bi-download me-2"></i>
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Historial por Fechas -->
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="600">
+                        <div class="card-modern h-100" style="cursor: pointer;" onclick="generarReporte('historial')">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-4">
+                                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e4a7a20, #00c9b720); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-calendar-range" style="font-size: 3rem; color: #1e4a7a;"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3" style="color: #1e4a7a;">Historial por Fechas</h5>
+                                <p class="card-text text-muted mb-4">Reporte de préstamos en un rango de fechas</p>
+                                <button class="btn-modern secondary w-100" onclick="event.stopPropagation(); generarReporte('historial')">
+                                    <i class="bi bi-download me-2"></i>
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resultado del Reporte rediseñado -->
+                <div class="row mt-4" id="resultadoReporte" style="display: none;" data-aos="fade-up">
+                    <div class="col-md-12">
+                        <div class="card-modern">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-file-earmark-text me-2"></i>
+                                    <span id="reporteTitulo">Resultado del Reporte</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn-modern outline" onclick="exportarPDF()" data-bs-toggle="tooltip" title="Exportar a PDF">
+                                        <i class="bi bi-file-pdf"></i>
+                                    </button>
+                                    <button class="btn-modern success" onclick="exportarExcel()" data-bs-toggle="tooltip" title="Exportar a Excel">
+                                        <i class="bi bi-file-excel"></i>
+                                    </button>
+                                    <button class="btn-modern primary" onclick="imprimirReporte()" data-bs-toggle="tooltip" title="Imprimir">
+                                        <i class="bi bi-printer"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table-modern" id="tablaReporte">
+                                        <thead id="reporteHeaders">
+                                            <!-- Se llena con JavaScript -->
+                                        </thead>
+                                        <tbody id="reporteBody">
+                                            <!-- Se llena con JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Paginación simple (opcional) -->
+                                <div class="d-flex justify-content-between align-items-center mt-4" id="paginacionReporte" style="display: none;">
+                                    <span class="text-muted" id="infoPaginacion">Mostrando 1-10 de 25 resultados</span>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn-modern outline py-2 px-3" onclick="paginaAnterior()">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </button>
+                                        <button class="btn-modern outline py-2 px-3" onclick="paginaSiguiente()">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resumen de estadísticas -->
+                <div class="row mt-4" data-aos="fade-up">
+                    <div class="col-md-3">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #1e4a7a 0%, #2c6b9e 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${totalPrestamosPeriodo}">0</div>
+                                    <div class="stat-label">Préstamos del Mes</div>
+                                </div>
+                                <i class="bi bi-calendar-month" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #00c9b7 0%, #1e4a7a 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${librosPrestados}">0</div>
+                                    <div class="stat-label">Libros Prestados</div>
+                                </div>
+                                <i class="bi bi-book" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #ffb347 0%, #1e4a7a 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${tasaDevolucion}">98%</div>
+                                    <div class="stat-label">Tasa de Devolución</div>
+                                </div>
+                                <i class="bi bi-arrow-return-left" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card-modern" style="background: linear-gradient(135deg, #ff4757 0%, #1e4a7a 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stat-number" th:text="${promedioPrestamos}">4.5</div>
+                                    <div class="stat-label">Promedio por Usuario</div>
+                                </div>
+                                <i class="bi bi-bar-chart" style="font-size: 2.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de vista previa del reporte -->
+    <div class="modal fade" id="modalVistaPrevia" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #1e4a7a 0%, #2c6b9e 100%);">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        Vista Previa del Reporte
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" id="vistaPreviaContent">
+                    <!-- Se llena con JavaScript -->
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn-modern outline" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cerrar
+                    </button>
+                    <button type="button" class="btn-modern primary" onclick="exportarExcel()">
+                        <i class="bi bi-file-excel me-2"></i>
+                        Exportar a Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Incluir footer rediseñado -->
+    <div th:replace="~{layout/header :: footer}"></div>
+    
+    <script>
+        let reporteActual = null;
+        let paginaActual = 1;
+        let itemsPorPagina = 10;
+        
+        // Función para generar reportes mejorada
+        function generarReporte(tipo) {
+            let fechaInicio = document.getElementById('fechaInicio').value;
+            let fechaFin = document.getElementById('fechaFin').value;
+            
+            // Mostrar loading
+            Swal.fire({
+                title: 'Generando reporte...',
+                html: 'Por favor espere',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            let url = '';
+            switch(tipo) {
+                case 'activos':
+                    url = '/api/admin/reportes/prestamos-activos';
+                    break;
+                case 'vencidos':
+                    url = '/api/admin/reportes/prestamos-vencidos';
+                    break;
+                case 'top-libros':
+                    url = '/api/admin/reportes/top-libros?limite=10';
+                    break;
+                case 'usuarios-activos':
+                    url = '/api/admin/reportes/usuarios-activos?limite=10';
+                    break;
+                case 'categorias':
+                    url = '/api/admin/reportes/estadisticas-categorias';
+                    break;
+                case 'historial':
+                    url = '/api/admin/reportes/historial?fechaInicio=' + fechaInicio + '&fechaFin=' + fechaFin;
+                    break;
+            }
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    Swal.close();
+                    reporteActual = { tipo, data };
+                    mostrarReporte(tipo, data);
+                    document.getElementById('resultadoReporte').scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    Swal.close();
+                    showNotification('❌ Error al generar reporte: ' + error.message, 'error');
+                });
+        }
+        
+        // Función para mostrar el reporte mejorada
+        function mostrarReporte(tipo, data) {
+            document.getElementById('resultadoReporte').style.display = 'block';
+            
+            let headers = document.getElementById('reporteHeaders');
+            let body = document.getElementById('reporteBody');
+            
+            headers.innerHTML = '';
+            body.innerHTML = '';
+            
+            let titulo = '';
+            switch(tipo) {
+                case 'activos':
+                    titulo = '📋 Préstamos Activos';
+                    break;
+                case 'vencidos':
+                    titulo = '⚠️ Préstamos Vencidos';
+                    break;
+                case 'top-libros':
+                    titulo = '🏆 Top 10 Libros Más Prestados';
+                    break;
+                case 'usuarios-activos':
+                    titulo = '👥 Top 10 Usuarios Más Activos';
+                    break;
+                case 'categorias':
+                    titulo = '📊 Estadísticas por Categoría';
+                    break;
+                case 'historial':
+                    titulo = '📅 Historial de Préstamos';
+                    break;
+            }
+            
+            document.getElementById('reporteTitulo').innerHTML = `
+                <i class="bi bi-file-earmark-text me-2"></i>
+                ${titulo}
+                <span class="badge-modern info ms-3">Total: ${data.totalRegistros || data.length || 0}</span>
+            `;
+            
+            switch(tipo) {
+                case 'activos':
+                case 'vencidos':
+                    headers.innerHTML = `
+                        <tr>
+                            <th>ID</th>
+                            <th>Alumno</th>
+                            <th>Email</th>
+                            <th>Libro</th>
+                            <th>Código</th>
+                            <th>Fecha Préstamo</th>
+                            <th>Fecha Devolución</th>
+                            <th>Estado</th>
+                        </tr>
+                    `;
+                    
+                    data.prestamos.forEach(p => {
+                        let estadoClass = p.estado === 'ACTIVO' ? 'success' : 'danger';
+                        body.innerHTML += `
+                            <tr>
+                                <td><span class="fw-semibold">${p.id}</span></td>
+                                <td>${p.usuarioNombre}</td>
+                                <td><small>${p.usuarioEmail}</small></td>
+                                <td class="fw-semibold">${p.libroNombre}</td>
+                                <td><code class="bg-light p-1 rounded">${p.libroCodigo}</code></td>
+                                <td>${p.fechaPrestamoFormatted}</td>
+                                <td>${p.fechaDevolucionEstimadaFormatted}</td>
+                                <td><span class="badge-modern ${estadoClass}">${p.estado}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'top-libros':
+                    headers.innerHTML = `
+                        <tr>
+                            <th>#</th>
+                            <th>Libro</th>
+                            <th>Código</th>
+                            <th>Categoría</th>
+                            <th>Total Préstamos</th>
+                        </tr>
+                    `;
+                    
+                    data.topLibros.forEach((libro, index) => {
+                        body.innerHTML += `
+                            <tr>
+                                <td><span class="badge-modern info">${index + 1}</span></td>
+                                <td class="fw-semibold">${libro.libroNombre}</td>
+                                <td><code class="bg-light p-1 rounded">${libro.libroCodigo}</code></td>
+                                <td><span class="badge-modern info">${libro.categoria}</span></td>
+                                <td><span class="badge-modern success">${libro.totalPrestamos}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'usuarios-activos':
+                    headers.innerHTML = `
+                        <tr>
+                            <th>#</th>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Total Préstamos</th>
+                        </tr>
+                    `;
+                    
+                    data.usuarios.forEach((usuario, index) => {
+                        body.innerHTML += `
+                            <tr>
+                                <td><span class="badge-modern info">${index + 1}</span></td>
+                                <td class="fw-semibold">${usuario.usuario}</td>
+                                <td>${usuario.email || 'N/A'}</td>
+                                <td><span class="badge-modern success">${usuario.totalPrestamos}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'categorias':
+                    headers.innerHTML = `
+                        <tr>
+                            <th>Categoría</th>
+                            <th>Libros</th>
+                            <th>Préstamos</th>
+                            <th>Porcentaje</th>
+                        </tr>
+                    `;
+                    
+                    let categorias = new Set([
+                        ...Object.keys(data.librosPorCategoria),
+                        ...Object.keys(data.prestamosPorCategoria)
+                    ]);
+                    
+                    let totalPrestamos = Object.values(data.prestamosPorCategoria).reduce((a, b) => a + b, 0);
+                    
+                    categorias.forEach(categoria => {
+                        let prestamos = data.prestamosPorCategoria[categoria] || 0;
+                        let porcentaje = totalPrestamos > 0 ? ((prestamos / totalPrestamos) * 100).toFixed(1) : 0;
+                        
+                        body.innerHTML += `
+                            <tr>
+                                <td><span class="badge-modern info">${categoria}</span></td>
+                                <td>${data.librosPorCategoria[categoria] || 0}</td>
+                                <td><span class="badge-modern success">${prestamos}</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                            <div class="progress-bar" style="width: ${porcentaje}%; background: linear-gradient(90deg, #1e4a7a, #00c9b7);"></div>
+                                        </div>
+                                        <small>${porcentaje}%</small>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'historial':
+                    headers.innerHTML = `
+                        <tr>
+                            <th>ID</th>
+                            <th>Alumno</th>
+                            <th>Libro</th>
+                            <th>Fecha Préstamo</th>
+                            <th>Fecha Devolución</th>
+                            <th>Estado</th>
+                        </tr>
+                    `;
+                    
+                    data.prestamos.forEach(p => {
+                        let estadoClass = p.estado === 'ACTIVO' ? 'success' : (p.estado === 'VENCIDO' ? 'danger' : 'info');
+                        body.innerHTML += `
+                            <tr>
+                                <td><span class="fw-semibold">${p.id}</span></td>
+                                <td>${p.usuarioNombre}</td>
+                                <td class="fw-semibold">${p.libroNombre}</td>
+                                <td>${p.fechaPrestamoFormatted}</td>
+                                <td>${p.fechaDevolucionReal ? p.fechaDevolucionRealFormatted : p.fechaDevolucionEstimadaFormatted}</td>
+                                <td><span class="badge-modern ${estadoClass}">${p.estado}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+            }
+        }
+        
+        // Función para aplicar filtros de fecha mejorada
+        function aplicarFiltros() {
+            let fechaInicio = document.getElementById('fechaInicio').value;
+            let fechaFin = document.getElementById('fechaFin').value;
+            
+            if (!fechaInicio || !fechaFin) {
+                showNotification('⚠️ Por favor seleccione ambas fechas', 'warning');
+                return;
+            }
+            
+            if (fechaInicio > fechaFin) {
+                showNotification('❌ La fecha de inicio no puede ser mayor a la fecha fin', 'error');
+                return;
+            }
+            
+            showNotification('✅ Filtros aplicados: ' + formatearFecha(fechaInicio) + ' al ' + formatearFecha(fechaFin), 'info');
+        }
+        
+        // Función para formatear fecha
+        function formatearFecha(fecha) {
+            let [year, month, day] = fecha.split('-');
+            return `${day}/${month}/${year}`;
+        }
+        
+        // Función para exportar a Excel mejorada
+        function exportarExcel() {
+            if (!reporteActual) {
+                showNotification('⚠️ No hay reporte para exportar', 'warning');
+                return;
+            }
+            
+            let csv = [];
+            let rows = document.querySelectorAll('#tablaReporte tr');
+            
+            rows.forEach(row => {
+                let rowData = [];
+                row.querySelectorAll('th, td').forEach(cell => {
+                    // Limpiar el texto de iconos HTML
+                    let text = cell.innerText.replace(/[^\w\sáéíóúÁÉÍÓÚñÑ0-9@.,;:-]/g, '').trim();
+                    rowData.push('"' + text.replace(/"/g, '""') + '"');
+                });
+                if (rowData.length > 0) {
+                    csv.push(rowData.join(','));
+                }
+            });
+            
+            let csvContent = csv.join('\n');
+            let blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' }); // \uFEFF para UTF-8 con BOM
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'reporte_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click();
+            
+            showNotification('✅ Reporte exportado correctamente');
+        }
+        
+        // Función para exportar a PDF (simulada)
+        function exportarPDF() {
+            showNotification('📄 Función de exportación a PDF próximamente', 'info');
+        }
+        
+        // Función para imprimir reporte
+        function imprimirReporte() {
+            if (!reporteActual) {
+                showNotification('⚠️ No hay reporte para imprimir', 'warning');
+                return;
+            }
+            
+            let ventanaImpresion = window.open('', '_blank');
+            ventanaImpresion.document.write(`
+                <html>
+                    <head>
+                        <title>Reporte - Biblioteca Escolar</title>
+                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                        <style>
+                            body { padding: 20px; font-family: Arial, sans-serif; }
+                            table { width: 100%; border-collapse: collapse; }
+                            th { background: #1e4a7a; color: white; padding: 10px; }
+                            td { padding: 8px; border-bottom: 1px solid #ddd; }
+                            .badge { padding: 5px 10px; border-radius: 20px; color: white; }
+                            .badge-success { background: #00c9b7; }
+                            .badge-danger { background: #ff4757; }
+                            .badge-info { background: #1e4a7a; }
+                        </style>
+                    </head>
+                    <body>
+                        <h2 style="color: #1e4a7a;">${document.getElementById('reporteTitulo').innerText}</h2>
+                        <hr>
+                        ${document.getElementById('tablaReporte').outerHTML}
+                        <hr>
+                        <small>Generado el ${new Date().toLocaleDateString('es-ES')}</small>
+                    </body>
+                </html>
+            `);
+            ventanaImpresion.document.close();
+            ventanaImpresion.print();
+        }
+        
+        // Funciones de paginación (placeholder)
+        function paginaAnterior() {
+            if (paginaActual > 1) {
+                paginaActual--;
+                showNotification('Página ' + paginaActual, 'info');
+            }
+        }
+        
+        function paginaSiguiente() {
+            paginaActual++;
+            showNotification('Página ' + paginaActual, 'info');
+        }
+        
+        // Inicializar tooltips para botones de exportación
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>
